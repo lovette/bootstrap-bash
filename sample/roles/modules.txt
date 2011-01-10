@@ -1,0 +1,3 @@
+# These modules will be installed for ALL roles
+base
+ssh

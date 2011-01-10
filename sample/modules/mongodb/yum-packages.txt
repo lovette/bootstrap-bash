@@ -1,0 +1,6 @@
+# Add the 10gen repository to yum.repos.d
+yum-repo-add:files/10gen.repo
+
+mongo-stable
+mongo-stable-server
+mongo-stable-debuginfo

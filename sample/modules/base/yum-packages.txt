@@ -1,0 +1,9 @@
+# Add the EPEL repository to yum.repos.d
+yum-repo-add:http://download.fedora.redhat.com/pub/epel/5/{BOOTSTRAP_BASEARCH}/epel-release-5-4.noarch.rpm
+
+# These Yum packages will be removed
+-wireless-tools
+
+# These Yum packages will be added
+man
+which

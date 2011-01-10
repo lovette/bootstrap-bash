@@ -1,0 +1,2 @@
+# These modules will be installed for only for the DEV role
+mongodb

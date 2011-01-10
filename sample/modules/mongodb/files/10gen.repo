@@ -1,0 +1,6 @@
+# Read more at http://www.mongodb.org/display/DOCS/CentOS+and+Fedora+Packages
+
+[10gen]
+name=10gen Repository
+baseurl=http://downloads.mongodb.org/distros/centos/5.4/os/{BOOTSTRAP_BASEARCH}/
+gpgcheck=0

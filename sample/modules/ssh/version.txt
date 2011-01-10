@@ -1,0 +1,2 @@
+Description: Secure shell customizations
+Version: 1.0
