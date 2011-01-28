@@ -51,7 +51,7 @@ bootstrap_mkdir()
 	fi
 }
 
-# bootstrap_wget(url, path)
+# bootstrap_wget(url, path[, args])
 # Download url and save as path
 # Local save directory will be created if it does not exist
 # No-op if path exists
@@ -60,12 +60,21 @@ bootstrap_file_wget()
 	local geturl=$1
 	local localfile=$2
 	local localdir=$(dirname "$localfile")
+	local localbase=$(basename "$localfile")
+	local localtmp="$BOOTSTRAP_DIR_TMP/wget-$localbase"
+	local wgetout="${localtmp}.stdout"
+	local wgetargs=
+
+	[ $# -ge 3 ] && wgetargs="$3"
+	wgetargs="$wgetargs -O $localtmp"
 
 	if [ ! -f "$localfile" ]; then
 		bootstrap_mkdir "$localdir" 755
 		echo " * downloading $geturl"
-		/usr/bin/wget -q -O "${localfile}" "${geturl}"
-		[ $? -ne 0 ] && bootstrap_die
+		echo " *          as $localfile"
+		/usr/bin/wget $wgetargs "$geturl" > "$wgetout" 2>&1
+		[ $? -ne 0 ] && sed "s/^/ ! wget:  /" "$wgetout" && bootstrap_die
+		/bin/mv "$localtmp" "$localfile"
 	fi
 }
 
