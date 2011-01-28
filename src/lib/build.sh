@@ -17,36 +17,42 @@ bootstrap_build_exec()
 	local errprefix="$3"
 	local cmd="$4"
 
+	echo " * executing '$cmd' in $directory"
+
 	[ -d "$directory" ] || boostrap_die "$directory: directory does not exist"
 	[ -w "$directory" ] || boostrap_die "$directory: directory is not writable"
 
 	(cd $directory && $cmd &> $outfile)
 	if [ $? -ne 0 ]; then
-		cat $outfile | sed 's/^/ * $errprefix:  /'
+		cat $outfile | sed "s/^/ * $errprefix:  /"
 		bootstrap_die
 	fi
 }
 
-# bootstrap_build_make(directory, outfile, makeargs)
+# bootstrap_build_make(directory, outfile[, makeargs])
 # Executes "make" in a specified directory, saving output to outfile
 # If make fails, output will be displayed and boostrap_die is called
 bootstrap_build_make()
 {
 	local directory="$1"
 	local outfile="$2"
-	local makeargs="$3"
+	local cmd="make"
 
-	bootstrap_build_exec $directory $outfile "make" "make $makeargs"
+	[ $# -ge 3 ] && cmd="$cmd $3"
+
+	bootstrap_build_exec $directory $outfile "make" "$cmd"
 }
 
-# bootstrap_build_configure(directory, outfile, cmdargs)
+# bootstrap_build_configure(directory, outfile[, cmdargs])
 # Executes "configure" in a specified directory, saving output to outfile
 # If configure fails, output will be displayed and boostrap_die is called
 bootstrap_build_configure()
 {
     local directory="$1"
     local outfile="$2"
-    local cmdargs="$3"
+	local cmd="./configure"
 
-	bootstrap_build_exec $directory $outfile "make" "./configure $cmdargs"
+	[ $# -ge 3 ] && cmd="$cmd $3"
+
+	bootstrap_build_exec $directory $outfile "make" "$cmd"
 }
