@@ -18,6 +18,7 @@ BOOTSTRAP_DIR_LIB="/usr/share/bootstrap-bash/lib"
 BOOTSTRAP_DIR_CACHE="/var/bootstrap-bash"
 BOOTSTRAP_DIR_CACHE_RPM="$BOOTSTRAP_DIR_CACHE/rpms"
 BOOTSTRAP_DIR_ROLE=""
+BOOTSTRAP_DIR_TMP="/tmp/bootstrap-bash-$$.tmp"
 BOOTSTRAP_BASEARCH=$(/bin/uname -i)
 BOOTSTRAP_MODULE_NAMES=( )
 BOOTSTRAP_GETOPT_CONFIG=""
@@ -283,6 +284,8 @@ fi
 # Install process...
 #
 
+mkdir -p "$BOOTSTRAP_DIR_TMP" || bootstrap_die
+
 [ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_preinstall "${BOOTSTRAP_MODULE_NAMES[@]}"
 
 bootstrap_rpm_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
@@ -291,6 +294,8 @@ bootstrap_yum_repos_add "${BOOTSTRAP_MODULE_NAMES[@]}"
 bootstrap_yum_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
 
 [ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+
+/bin/rm -rf "$BOOTSTRAP_DIR_TMP" || bootstrap_die
 
 echo ""
 echo "Bootstrap complete!"
