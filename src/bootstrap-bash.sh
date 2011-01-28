@@ -147,6 +147,11 @@ function confirm()
 	echo
 }
 
+function onexit()
+{
+	[ -d "$BOOTSTRAP_DIR_TMP" ] && /bin/rm -rf "$BOOTSTRAP_DIR_TMP"
+}
+
 ##########################################################################
 # Main
 
@@ -286,6 +291,9 @@ fi
 
 mkdir -p "$BOOTSTRAP_DIR_TMP" || bootstrap_die
 
+# Remove temp dir on exit
+trap "onexit" EXIT
+
 [ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_preinstall "${BOOTSTRAP_MODULE_NAMES[@]}"
 
 bootstrap_rpm_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
@@ -294,8 +302,6 @@ bootstrap_yum_repos_add "${BOOTSTRAP_MODULE_NAMES[@]}"
 bootstrap_yum_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
 
 [ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_install "${BOOTSTRAP_MODULE_NAMES[@]}"
-
-/bin/rm -rf "$BOOTSTRAP_DIR_TMP" || bootstrap_die
 
 echo ""
 echo "Bootstrap complete!"
