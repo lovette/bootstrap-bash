@@ -29,7 +29,7 @@ bootstrap_file_chown()
 	local filepath=$1
 	local fileowner=$2
 
-	if [ ! -z "$fileowner" ]; then
+	if [ -n "$fileowner" ]; then
 		/bin/chown "$fileowner" "$filepath"
 		[ $? -ne 0 ] && bootstrap_die
 	fi
@@ -235,7 +235,7 @@ bootstrap_file_get_contents_list()
 {
 	get_file_contents_return=""
 
-	if [ ! -z "$1" ]; then
+	if [ -n "$1" ]; then
 		if [ -f "$1" ]; then
 			get_file_contents_return=$(grep -v "^#" "$1" | tr -s '[:space:]' ' ')
 		fi
@@ -270,7 +270,7 @@ bootstrap_dir_chown()
 	local dirpath=$1
 	local dirowner=$2
 
-	if [ ! -z "$dirowner" ]; then
+	if [ -n "$dirowner" ]; then
 		/bin/chown -R "$dirowner" "$dirpath"
 		[ $? -ne 0 ] && bootstrap_die
 	fi
