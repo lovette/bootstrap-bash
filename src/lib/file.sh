@@ -84,7 +84,7 @@ bootstrap_file_untar()
 		echo " * extracting `basename $tarfile` to $targetdir/"
 		/bin/tar xfz "$tarfile" --strip-components 1 -C "$targetdir"
 		[ $? -ne 0 ] && bootstrap_die
-		bootstrap_file_chown "$targetdir" "$fileowner"
+		bootstrap_dir_chown "$targetdir" "$fileowner"
 	fi
 }
 
