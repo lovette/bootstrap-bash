@@ -212,6 +212,28 @@ bootstrap_modules_preinstall()
 	done
 }
 
+# bootstrap_modules_config(array of module names)
+bootstrap_modules_config()
+{
+	local module=""
+	local modules=( "$@" )
+	local moduledir=""
+	local configscript=""
+
+	for module in "${modules[@]}";
+	do
+		moduledir="${BOOTSTRAP_DIR_MODULES}/${module}"
+		configscript="${moduledir}/config.sh"
+
+		if [ -f "$configscript" ]; then
+			echo ""
+			echo "Configuring ${module} module..."
+			bootstrap_modules_script_exec "$module" "$configscript"
+			bootstrap_modules_set_state "$module" "config-sh"
+		fi
+	done
+}
+
 # bootstrap_modules_install(array of module names)
 bootstrap_modules_install()
 {
@@ -219,11 +241,13 @@ bootstrap_modules_install()
 	local modules=( "$@" )
 	local moduledir=""
 	local installscript=""
+	local configscript=""
 
 	for module in "${modules[@]}";
 	do
 		moduledir="${BOOTSTRAP_DIR_MODULES}/${module}"
 		installscript="${moduledir}/install.sh"
+		configscript="${moduledir}/config.sh"
 
 		if [ -f "$installscript" ]; then
 			echo ""
@@ -233,11 +257,20 @@ bootstrap_modules_install()
 				bootstrap_modules_script_exec "$module" "$installscript"
 				bootstrap_modules_set_state "$module" "install-sh"
 			else
-				echo " * Module previously installed, skipping (use -f to override)"
+				echo " ! Module previously installed (use -f to force install)"
 			fi
-		else
+		fi
+
+		if [ -f "$configscript" ]; then
 			echo ""
-			echo "Installed ${module} module via packages"
+			echo "Configuring ${module} module..."
+
+			if ! bootstrap_modules_check_state "$module" "config-sh"; then
+				bootstrap_modules_script_exec "$module" "$configscript"
+				bootstrap_modules_set_state "$module" "config-sh"
+			else
+				echo " ! Module previously configured (use -u to refresh)"
+			fi
 		fi
 	done
 }

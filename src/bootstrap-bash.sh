@@ -11,7 +11,7 @@ CMDNAME=$(basename "$CMDPATH")
 CMDDIR=$(dirname "$CMDPATH")
 CMDARGS=$@
 
-BOOTSTRAP_VER="1.0.0"
+BOOTSTRAP_VER="1.0.1"
 BOOTSTRAP_ROLE=""
 BOOTSTRAP_DIR_ROOT="$CMDDIR"
 BOOTSTRAP_DIR_LIB="/usr/share/bootstrap-bash/lib"
@@ -30,6 +30,7 @@ BOOTSTRAP_GETOPT_BASH_DEBUG=0
 BOOTSTRAP_GETOPT_MODULE_NAMES=( )
 BOOTSTRAP_GETOPT_PROMPT=1
 BOOTSTRAP_GETOPT_PACKAGESONLY=0
+BOOTSTRAP_GETOPT_CONFIGONLY=0
 
 # Runtime configuration file must define these
 BOOTSTRAP_DIR_MODULES=""
@@ -69,9 +70,10 @@ function usage()
 	echo "  -h, --help     Show this help and exit"
 	echo "  -l             List modules that would be installed"
 	echo "  -m MODULE      Install only this module (specify -m for each module)"
-	echo "  -p             Package management only, no pre/install scripts are run"
+	echo "  -p             Package management only, skip install scripts"
 	echo "  -s             Debug: output module install script commands, check syntax (implies -d)"
 	echo "  -V, --version  Print version and exit"
+	echo "  -u             Update configurations only, skip package management and install scripts"
 	echo "  -x             Debug: execute module install scripts with 'bash -x'"
 	echo "  -y             Answer yes for all questions"
 	echo
@@ -176,7 +178,7 @@ source ${BOOTSTRAP_DIR_LIB}/yum.sh
 source ${BOOTSTRAP_DIR_LIB}/rpm.sh
 
 # Parse command line options
-while getopts "c:dfhlm:psVxy" opt
+while getopts "c:dfhlm:psVuxy" opt
 do
 	case $opt in
 	c  ) BOOTSTRAP_GETOPT_CONFIG=$OPTARG;;
@@ -187,6 +189,7 @@ do
 	m  ) BOOTSTRAP_GETOPT_MODULE_NAMES[${#BOOTSTRAP_GETOPT_MODULE_NAMES[@]}]=$OPTARG;;
 	p  ) BOOTSTRAP_GETOPT_PACKAGESONLY=1; BOOTSTRAP_GETOPT_FORCE=0;;
 	s  ) BOOTSTRAP_GETOPT_DRYRUN=1; BOOTSTRAP_GETOPT_PRINTSCRIPTS=1;;
+	u  ) BOOTSTRAP_GETOPT_CONFIGONLY=1; BOOTSTRAP_GETOPT_FORCE=0;;
 	x  ) BOOTSTRAP_GETOPT_BASH_DEBUG=1;;
 	y  ) BOOTSTRAP_GETOPT_PROMPT=0;;
 	V  ) version;;
@@ -262,7 +265,13 @@ fi
 
 echo "Executing bootstrap process for $BOOTSTRAP_ROLE role..."
 
-[ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ] && echo "Package management only, no install scripts will be run"
+if [ $BOOTSTRAP_GETOPT_CONFIGONLY -eq 1 ] && [ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ]; then
+	bootstrap_die "Command line options -p and -u cannot be combined"
+elif [ $BOOTSTRAP_GETOPT_CONFIGONLY -eq 1 ]; then
+	echo "Configuration management only, skipping package management and install scripts"
+elif [ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ]; then
+	echo "Package management only, skipping install scripts"
+fi
 
 # Confirm with the user if necessary
 [ $BOOTSTRAP_GETOPT_PROMPT -eq 1 ] && confirm
@@ -294,14 +303,18 @@ mkdir -p "$BOOTSTRAP_DIR_TMP" || bootstrap_die
 # Remove temp dir on exit
 trap "onexit" EXIT
 
-[ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_preinstall "${BOOTSTRAP_MODULE_NAMES[@]}"
+if [ $BOOTSTRAP_GETOPT_CONFIGONLY -ne 1 ]; then
+	[ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_preinstall "${BOOTSTRAP_MODULE_NAMES[@]}"
 
-bootstrap_rpm_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
-bootstrap_yum_packages_remove "${BOOTSTRAP_MODULE_NAMES[@]}"
-bootstrap_yum_repos_add "${BOOTSTRAP_MODULE_NAMES[@]}"
-bootstrap_yum_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+	bootstrap_rpm_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+	bootstrap_yum_packages_remove "${BOOTSTRAP_MODULE_NAMES[@]}"
+	bootstrap_yum_repos_add "${BOOTSTRAP_MODULE_NAMES[@]}"
+	bootstrap_yum_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
 
-[ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+	[ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+else
+	bootstrap_modules_config "${BOOTSTRAP_MODULE_NAMES[@]}"
+fi
 
 echo ""
 echo "Bootstrap complete!"

@@ -57,6 +57,7 @@ Each module available must be a subdirectory below a root modules directory.
 	|-- version.txt      - Module information (optional)
 	|-- preinstall.sh    - BASH script to execute before modules are installed (optional)
 	|-- install.sh       - BASH script to execute to install module (optional)
+	|-- config.sh        - BASH script to execute to configure module (optional)
 	|-- yum-packages.txt - Yum packages to install or remove (optional)
 	|-- rpm-packages.txt - RPM packages to install or remove (optional)
 
@@ -135,7 +136,7 @@ other package management tools.
 Module Installation
 ---
 
-### preinstall.sh and install.sh
+### preinstall.sh, install.sh, config.sh
 
 The module install scripts are BASH scripts that execute commands and functions
 to install the software related to the module.
@@ -159,4 +160,4 @@ How it works
 4. Yum packages are removed (yum-packages.txt)
 5. Yum repositories are updated (yum-packages.txt)
 6. Yum packages are installed (yum-packages.txt)
-7. Module install scripts are executed (install.sh)
+7. Module install scripts are executed (install.sh then config.sh)
