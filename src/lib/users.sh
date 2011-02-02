@@ -40,10 +40,10 @@ bootstrap_user_group_add()
 # Exits if the user cannot be added
 bootstrap_user_add_system()
 {
-	local ADDUID=$1
-	local UNAME=$2
-	local UCOMMENT=$3
-	local UHOME=$4
+	local ADDUID="$1"
+	local UNAME="$2"
+	local UCOMMENT="$3"
+	local UHOME="$4"
 
 	if ! bootstrap_user_exists $UNAME; then
 		bootstrap_user_group_add $ADDUID $UNAME
@@ -53,19 +53,21 @@ bootstrap_user_add_system()
 	fi
 }
 
-# bootstrap_user_add_login(uid, name, comment, home)
+# bootstrap_user_add_login(uid, name, comment, password)
 # Add an account for a person who has login rights
 # Exits if the user cannot be added
+# Requires Perl be installed so password can be encrypted
 bootstrap_user_add_login()
 {
-	local ADDUID=$1
-	local UNAME=$2
-	local UCOMMENT=$3
-	local UHOME=$4
+	local ADDUID="$1"
+	local UNAME="$2"
+	local UCOMMENT="$3"
+	local UPASSPLAIN="$4"
+	local UPASSCRYPT=$(perl -e 'print crypt($ARGV[0], "password")' $UPASSPLAIN)
 
 	if ! bootstrap_user_exists $UNAME; then
 		bootstrap_user_group_add $ADDUID $UNAME
-		/usr/sbin/useradd -u $ADDUID -g $UNAME -c "$UCOMMENT" -m -n -s /bin/bash -G users -p $UNAME $UNAME
+		/usr/sbin/useradd -u $ADDUID -g $UNAME -c "$UCOMMENT" -m -n -s /bin/bash -G users -p $UPASSCRYPT $UNAME
 		[ $? -ne 0 ] && boostrap_die
 		# Force password change on next login
 		/usr/bin/chage -d 0 $UNAME
