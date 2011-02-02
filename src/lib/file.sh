@@ -36,17 +36,27 @@ bootstrap_file_chown()
 }
 
 # bootstrap_mkdir(path, perms)
+# bootstrap_mkdir(path, owner, perms)
 # Create directory with permissions set to perms
 # No-op if directory exists
 bootstrap_mkdir()
 {
 	local dirpath=$1
-	local dirmod=$2
+	local dirmod=
+	local dirowner=
+
+	if [ $# -ge 3 ]; then
+		dirowner=$2
+		dirmod=$3
+	else
+		dirmod=$2
+	fi
 
 	if [ ! -d "$dirpath" ]; then
 		/bin/mkdir -p $dirpath
 		[ $? -ne 0 ] && bootstrap_die
-		bootstrap_file_chmod $dirpath $dirmod
+		bootstrap_dir_chmod $dirpath $dirmod $dirmod
+		bootstrap_dir_chown "$dirpath" "$dirowner"
 		echo " * mkdir ${dirpath}/"
 	fi
 }
