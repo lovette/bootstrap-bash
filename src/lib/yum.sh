@@ -209,10 +209,10 @@ bootstrap_yum_packages_install()
 		for reponame in $repos;
 		do
 			if [ "$reponame" == "-" ]; then
-				echo " * default repositories:"
+				echo " * from default repositories:"
 				yumargs=""
 			else
-				echo " * $reponame repository only:"
+				echo " * from $reponame repository only:"
 				yumargs="--disablerepo=* --enablerepo=$reponame"
 			fi
 
