@@ -264,6 +264,7 @@ fi
 [ -d "$BOOTSTRAP_DIR_CACHE" ] || bootstrap_die "$BOOTSTRAP_DIR_CACHE: cache directory does not exist"
 
 echo "Executing bootstrap process for $BOOTSTRAP_ROLE role..."
+echo "Platform is $BOOTSTRAP_BASEARCH"
 
 if [ $BOOTSTRAP_GETOPT_CONFIGONLY -eq 1 ] && [ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ]; then
 	bootstrap_die "Command line options -p and -u cannot be combined"

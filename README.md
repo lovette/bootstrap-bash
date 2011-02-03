@@ -145,9 +145,9 @@ The following global variables are available to the script:
 
 * BOOTSTRAP_MODULE_NAME - The name of the module being installed
 * BOOTSTRAP_ROLE - The active role being installed
+* BOOTSTRAP_BASEARCH - The server base architecture (e.g. i386, x86_64)
 * BOOTSTRAP_DIR_LIB - The directory with bootstrap library scripts
 * BOOTSTRAP_DIR_ROLE - The active roles directory
-* BOOTSTRAP_DIR_ARCH - The server base architecture (e.g. i386, x86_64)
 * BOOTSTRAP_DIR_MODULE - The directory containing the active module install script
 * BOOTSTRAP_DIR_MODULE_CACHE - The directory where module installation state is saved
 

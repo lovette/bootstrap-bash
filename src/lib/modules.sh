@@ -169,9 +169,9 @@ bootstrap_modules_script_exec()
 	# Allow install scripts to reference these variables
 	export BOOTSTRAP_MODULE_NAME
 	export BOOTSTRAP_ROLE
+	export BOOTSTRAP_BASEARCH
 	export BOOTSTRAP_DIR_LIB
 	export BOOTSTRAP_DIR_ROLE
-	export BOOTSTRAP_DIR_ARCH
 	export BOOTSTRAP_DIR_MODULE
 	export BOOTSTRAP_DIR_MODULE_CACHE
 	export BOOTSTRAP_DIR_TMP
