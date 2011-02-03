@@ -156,8 +156,13 @@ How it works
 ---
 1. Modules are enumerated based on role, unless specified on the command line
 2. Module preinstall scripts are executed (preinstall.sh)
-3. Yum packages are removed (yum-packages.txt)
-4. Yum repositories are updated (yum-packages.txt)
-5. Yum packages are installed (yum-packages.txt)
+3. Yum repositories are updated (yum-packages.txt)
+4. Yum packages are installed (yum-packages.txt)
+5. Yum packages are removed (yum-packages.txt)
 6. RPM packages are installed (rpm-packages.txt)
 7. Module install scripts are executed (install.sh then config.sh)
+
+Packages are removed after they are added so dependencies on removed packages
+can be fulfilled by new packages (as when replacing syslogd with rsyslogd).
+Packages without dependency management (ie. individual RPMs) are installed last
+so dependencies can be managed through a package manager.

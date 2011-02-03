@@ -307,9 +307,9 @@ trap "onexit" EXIT
 if [ $BOOTSTRAP_GETOPT_CONFIGONLY -ne 1 ]; then
 	[ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_preinstall "${BOOTSTRAP_MODULE_NAMES[@]}"
 
-	bootstrap_yum_packages_remove "${BOOTSTRAP_MODULE_NAMES[@]}"
 	bootstrap_yum_repos_add "${BOOTSTRAP_MODULE_NAMES[@]}"
 	bootstrap_yum_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+	bootstrap_yum_packages_remove "${BOOTSTRAP_MODULE_NAMES[@]}"
 
 	bootstrap_rpm_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
 
