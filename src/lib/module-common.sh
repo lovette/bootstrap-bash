@@ -18,3 +18,6 @@ bootstrap_die()
 	echo " ! Aborting module install"
 	exit 1
 }
+
+# Expand glob patterns which match no files to a null string
+shopt -s nullglob
