@@ -32,6 +32,11 @@ BOOTSTRAP_GETOPT_PROMPT=1
 BOOTSTRAP_GETOPT_PACKAGESONLY=0
 BOOTSTRAP_GETOPT_CONFIGONLY=0
 
+# You can find a list of color values at
+# https://wiki.archlinux.org/index.php/Color_Bash_Prompt
+BOOTSTRAP_TTYHEADER="\e[1;37m"
+BOOTSTRAP_TTYRESET="\e[0m"
+
 # Runtime configuration file must define these
 BOOTSTRAP_DIR_MODULES=""
 BOOTSTRAP_DIR_ROLES=""

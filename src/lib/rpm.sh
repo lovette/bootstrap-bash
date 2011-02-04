@@ -62,7 +62,7 @@ bootstrap_rpm_packages_install()
 	# Download RPMs
 	if [ ${#dlrpms[@]} -gt 0 ]; then
 		echo ""
-		echo "Downloading RPM packages..."
+		bootstrap_echo_header "Downloading RPM packages..."
 		echo " * saving RPMs in $BOOTSTRAP_DIR_CACHE_RPM/"
 
 		bootstrap_mkdir $BOOTSTRAP_DIR_CACHE_RPM 755
@@ -83,7 +83,7 @@ bootstrap_rpm_packages_install()
 	# Install RPMs
 	if [ ${#installrpms[@]} -gt 0 ]; then
 		echo ""
-		echo "Installing RPM packages..."
+		bootstrap_echo_header "Installing RPM packages..."
 
 		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
 			echo "${installrpms[@]}" | xargs /bin/rpm -Uv
@@ -93,7 +93,7 @@ bootstrap_rpm_packages_install()
 		fi
 	elif [ $skipped -gt 0 ]; then
 		echo ""
-		echo "Installing RPM packages..."
+		bootstrap_echo_header "Installing RPM packages..."
 		echo " * RPMs previously installed, skipping (use -f or -p to override)"
 	fi
 

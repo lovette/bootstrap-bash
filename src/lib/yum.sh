@@ -57,7 +57,7 @@ bootstrap_yum_repos_add()
 
 	if [ ${#rpms[@]} -gt 0 ] || [ ${#copyfiles[@]} -gt 0 ]; then
 		echo ""
-		echo "Adding Yum repositories..."
+		bootstrap_echo_header "Adding Yum repositories..."
 
 		# Install rpms all at once
 		if [ ${#rpms[@]} -gt 0 ]; then
@@ -84,7 +84,7 @@ bootstrap_yum_repos_add()
 		done
 	elif [ $skipped -gt 0 ]; then
 		echo ""
-		echo "Adding Yum repositories..."
+		bootstrap_echo_header "Adding Yum repositories..."
 		echo " * Repositories previously added, skipping (use -f or -p to override)"
 	fi
 
@@ -131,7 +131,7 @@ bootstrap_yum_packages_remove()
 	# Remove packages
 	if [ ${#packages[@]} -gt 0 ]; then
 		echo ""
-		echo "Removing Yum packages..."
+		bootstrap_echo_header "Removing Yum packages..."
 
 		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
 			/usr/bin/yum -q remove ${packages[@]}
@@ -141,7 +141,7 @@ bootstrap_yum_packages_remove()
 		fi
 	elif [ $skipped -gt 0 ]; then
 		echo ""
-		echo "Removing Yum packages..."
+		bootstrap_echo_header "Removing Yum packages..."
 		echo " * Packages previously removed, skipping (use -f or -p to override)"
 	fi
 
@@ -204,7 +204,7 @@ bootstrap_yum_packages_install()
 	# Install packages, grouped by repo
 	if [ -n "$repos" ]; then
 		echo ""
-		echo "Installing Yum packages..."
+		bootstrap_echo_header "Installing Yum packages..."
 
 		for reponame in $repos;
 		do
@@ -227,7 +227,7 @@ bootstrap_yum_packages_install()
 		done
 	elif [ $skipped -gt 0 ]; then
 		echo ""
-		echo "Installing Yum packages..."
+		bootstrap_echo_header "Installing Yum packages..."
 		echo " * Packages previously installed, skipping (use -f or -p to override)"
 	fi
 

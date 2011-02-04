@@ -200,7 +200,7 @@ bootstrap_modules_preinstall()
 
 		if [ -f "$installscript" ]; then
 			echo ""
-			echo "Preinstalling ${module} module..."
+			bootstrap_echo_header "Preinstalling ${module} module..."
 
 			if ! bootstrap_modules_check_state "$module" "preinstall-sh"; then
 				bootstrap_modules_script_exec "$module" "$installscript"
@@ -227,7 +227,7 @@ bootstrap_modules_config()
 
 		if [ -f "$configscript" ]; then
 			echo ""
-			echo "Configuring ${module} module..."
+			bootstrap_echo_header "Configuring ${module} module..."
 			bootstrap_modules_script_exec "$module" "$configscript"
 			bootstrap_modules_set_state "$module" "config-sh"
 		fi
@@ -251,7 +251,7 @@ bootstrap_modules_install()
 
 		if [ -f "$installscript" ]; then
 			echo ""
-			echo "Installing ${module} module..."
+			bootstrap_echo_header "Installing ${module} module..."
 
 			if ! bootstrap_modules_check_state "$module" "install-sh"; then
 				bootstrap_modules_script_exec "$module" "$installscript"
@@ -263,7 +263,7 @@ bootstrap_modules_install()
 
 		if [ -f "$configscript" ]; then
 			echo ""
-			echo "Configuring ${module} module..."
+			bootstrap_echo_header "Configuring ${module} module..."
 
 			if ! bootstrap_modules_check_state "$module" "config-sh"; then
 				bootstrap_modules_script_exec "$module" "$configscript"
