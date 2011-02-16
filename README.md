@@ -30,8 +30,7 @@ Usage
 
 	bootstrap-bash [OPTION]... -c CONFIGFILE ROLE
 
-Run the command with `--help` argument or view the bootstrap-bash(8) manual
-page to see available OPTIONS.
+Run the command with `--help` argument or see bootstrap-bash(8) for available OPTIONS.
 
 
 Getting Started
@@ -39,7 +38,7 @@ Getting Started
 
 ### Configuration File
 
-The configuration file specified by -c must be a BASH script that at minimum
+The configuration file specified by `-c` must be a BASH script that at minimum
 defines the following two constants:
 
 	BOOTSTRAP_DIR_MODULES="/path/to/modules directory"
@@ -54,19 +53,19 @@ Each module available must be a subdirectory below a root modules directory.
 
 	modules/
 	|- <module name>/
-	|-- version.txt      - Module information (optional)
-	|-- preinstall.sh    - BASH script to execute before modules are installed (optional)
-	|-- install.sh       - BASH script to execute to install module (optional)
-	|-- config.sh        - BASH script to execute to configure module (optional)
-	|-- yum-packages.txt - Yum packages to install or remove (optional)
-	|-- rpm-packages.txt - RPM packages to install or remove (optional)
+	   |-- version.txt      - Module information (optional)
+	   |-- preinstall.sh    - BASH script to execute before modules are installed (optional)
+	   |-- install.sh       - BASH script to execute to install module (optional)
+	   |-- config.sh        - BASH script to execute to configure module (optional)
+	   |-- yum-packages.txt - Yum packages to install or remove (optional)
+	   |-- rpm-packages.txt - RPM packages to install or remove (optional)
 
 Each role available must be a subdirectory below a root roles directory.
 
 	roles/
-	|- modules.txt        - Modules to install for ALL roles (optional)
+	|- modules.txt          - Modules to install for ALL roles (optional)
 	|- <role>/
-	|-- modules.txt      - Modules to install for role <role>
+	   |-- modules.txt      - Modules to install for role <role>
 
 Role directories can have subdirectories. For example, you could define "server" roles below
 "development" and "public" roles. The modules.txt file in each parent directory
@@ -143,13 +142,14 @@ to install the software related to the module.
 
 The following global variables are available to the script:
 
-* BOOTSTRAP_MODULE_NAME - The name of the module being installed
-* BOOTSTRAP_ROLE - The active role being installed
-* BOOTSTRAP_BASEARCH - The server base architecture (e.g. i386, x86_64)
-* BOOTSTRAP_DIR_LIB - The directory with bootstrap library scripts
-* BOOTSTRAP_DIR_ROLE - The active roles directory
-* BOOTSTRAP_DIR_MODULE - The directory containing the active module install script
-* BOOTSTRAP_DIR_MODULE_CACHE - The directory where module installation state is saved
+* `BOOTSTRAP_MODULE_NAME` - The name of the module being installed
+* `BOOTSTRAP_ROLE` - The active role being installed
+* `BOOTSTRAP_BASEARCH` - The server base architecture (e.g. i386, x86_64)
+* `BOOTSTRAP_DIR_LIB` - The directory with bootstrap library scripts
+* `BOOTSTRAP_DIR_ROLE` - The active roles directory
+* `BOOTSTRAP_DIR_MODULE` - The directory containing the active module install script
+* `BOOTSTRAP_DIR_MODULE_CACHE` - The directory where module installation state is saved
+* `BOOTSTRAP_DIR_TMP` - The directory where temporary files can be saved
 
 
 How it works
