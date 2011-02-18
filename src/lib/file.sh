@@ -191,6 +191,37 @@ bootstrap_file_copy()
 	fi
 }
 
+# bootstrap_file_copy_glob(srcdir, destdir, glob, owner, perms, overwrite, removesuffix)
+# Copies srcdir/glob as destdir/file
+# See bootstrap_file_copy for description of owner, perms, overwrite
+bootstrap_file_copy_glob()
+{
+	local srcdir=$1
+	local destdir=$2
+	local glob=$3
+	local owner=$4
+	local perms=$5
+	local overwrite=$6
+	local removesuffix=$7
+	local path=
+	local name=
+
+	# Remove trailing slashes
+	srcdir=${srcdir%%/}
+	destdir=${destdir%%/}
+
+	[ -d "$srcdir" ] || bootstrap_die "cannot copy files: $srcdir: No such directory"
+	[ -d "$destdir" ] || bootstrap_die "cannot copy files: $destdir: No such directory"
+	[ -r "$srcdir" ] || bootstrap_die "cannot copy files: $srcdir: Read permission denied"
+	[ -w "$destdir" ] || bootstrap_die "cannot copy files: $destdir: Write permission denied"
+
+	for path in $srcdir/$glob
+	do
+		name=$(basename "$path" "$removesuffix")
+		bootstrap_file_copy "$path" "${destdir}/${name}" "$owner" $perms $overwrite
+	done
+}
+
 # bootstrap_file_link(path, target, perms)
 # Create path as a soft link to target with perms permissions
 # Will fail if path directory does not exist
