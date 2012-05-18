@@ -116,7 +116,8 @@ function confirm()
 
 	if [ "${#INSTALLMODULES[@]}" -gt 0 ]; then
 		echo "Installing:"
-		for module in "${INSTALLMODULES[@]}";
+		displaysorted=( $(printf '%s\n' "${INSTALLMODULES[@]}" | sort) )
+		for module in "${displaysorted[@]}";
 		do
 			bootstrap_modules_get_version_info "$module"
 			printf "$COLSPEC" " $module" "$module_version_ver" "$module_version_desc"
@@ -126,7 +127,8 @@ function confirm()
 
 	if [ "${#REINSTALLMODULES[@]}" -gt 0 ]; then
 		echo "REinstalling:"
-		for module in "${REINSTALLMODULES[@]}";
+		displaysorted=( $(printf '%s\n' "${REINSTALLMODULES[@]}" | sort) )
+		for module in "${displaysorted[@]}";
 		do
 			bootstrap_modules_get_version_info "$module"
 			printf "$COLSPEC" " $module" "$module_version_ver" "$module_version_desc"
@@ -136,7 +138,8 @@ function confirm()
 
 	if [ "${#REFRESHMODULES[@]}" -gt 0 ]; then
 		echo "Refreshing:"
-		for module in "${REFRESHMODULES[@]}";
+		displaysorted=( $(printf '%s\n' "${REFRESHMODULES[@]}" | sort) )
+		for module in "${displaysorted[@]}";
 		do
 			bootstrap_modules_get_version_info "$module"
 			printf "$COLSPEC" " $module" "$module_version_ver" "$module_version_desc"
