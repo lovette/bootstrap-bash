@@ -32,8 +32,8 @@ function bootstrap_yum_repos_add()
 		packagefilepath="${moduledir}/yum-packages.txt"
 
 		if [ -f "$packagefilepath" ]; then
-			rpmrepos=$(grep -E "^yum-repo-add:(.+)\.rpm$" "$packagefilepath" | sed -r -e "s/^yum-repo-add:(.+)/\1/" -e "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" -e "s/{BOOTSTRAP_PROCARCH}/${BOOTSTRAP_PROCARCH}/" | tr -s '[:space:]' ' ')
-			txtrepos=$(grep -E "^yum-repo-add:(.+)\.repo$" "$packagefilepath" | sed -r -e "s/^yum-repo-add:(.+)/\1/" -e "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" -e "s/{BOOTSTRAP_PROCARCH}/${BOOTSTRAP_PROCARCH}/" | tr -s '[:space:]' ' ')
+			rpmrepos=$(grep -E "^yum-repo-add:(.+)\.rpm$" "$packagefilepath" | sed -r "s/^yum-repo-add:(.+)/\1/" | sed -e "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" -e "s/{BOOTSTRAP_PROCARCH}/${BOOTSTRAP_PROCARCH}/" | tr -s '[:space:]' ' ')
+			txtrepos=$(grep -E "^yum-repo-add:(.+)\.repo$" "$packagefilepath" | sed -r "s/^yum-repo-add:(.+)/\1/" | sed -e "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" -e "s/{BOOTSTRAP_PROCARCH}/${BOOTSTRAP_PROCARCH}/" | tr -s '[:space:]' ' ')
 
 			if [ -n "$rpmrepos" ] || [ -n "$txtrepos" ]; then
 				if [ $forced -eq 1 ] || ! bootstrap_modules_check_state "$module" "yum-repo-add"; then
