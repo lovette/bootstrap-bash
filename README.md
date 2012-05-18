@@ -110,7 +110,8 @@ Add local files with this syntax:
 
 If you need a custom repository that does not follow these conventions, 
 you can modify yum.repos.d in a preinstall script. You can reference
-the processor architecture (e.g. i386, x86_64) with the tag {BOOTSTRAP_BASEARCH}.
+the hardware architecture (e.g. i386, x86_64) with the tag {BOOTSTRAP_BASEARCH}
+or the processor architecture (e.g. i686, x86_64) with {BOOTSTRAP_PROCARCH}.
 
 ### RPM
 
@@ -144,7 +145,8 @@ The following global variables are available to the script:
 
 * `BOOTSTRAP_MODULE_NAME` - The name of the module being installed
 * `BOOTSTRAP_ROLE` - The active role being installed
-* `BOOTSTRAP_BASEARCH` - The server base architecture (e.g. i386, x86_64)
+* `BOOTSTRAP_BASEARCH` - The server hardware (base) architecture (e.g. i386, x86_64)
+* `BOOTSTRAP_PROCARCH` - The server processor architecture (e.g. i686, x86_64)
 * `BOOTSTRAP_DIR_LIB` - The directory with bootstrap library scripts
 * `BOOTSTRAP_DIR_ROLE` - The active roles directory
 * `BOOTSTRAP_DIR_MODULE` - The directory containing the active module install script

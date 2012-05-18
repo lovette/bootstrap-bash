@@ -170,6 +170,7 @@ bootstrap_modules_script_exec()
 	export BOOTSTRAP_MODULE_NAME
 	export BOOTSTRAP_ROLE
 	export BOOTSTRAP_BASEARCH
+	export BOOTSTRAP_PROCARCH
 	export BOOTSTRAP_DIR_LIB
 	export BOOTSTRAP_DIR_ROLE
 	export BOOTSTRAP_DIR_MODULE

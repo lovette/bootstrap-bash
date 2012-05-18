@@ -11,7 +11,7 @@ CMDNAME=$(basename "$CMDPATH")
 CMDDIR=$(dirname "$CMDPATH")
 CMDARGS=$@
 
-BOOTSTRAP_VER="1.0.5"
+BOOTSTRAP_VER="1.0.6"
 BOOTSTRAP_ROLE=""
 BOOTSTRAP_DIR_ROOT="$CMDDIR"
 BOOTSTRAP_DIR_LIB="/usr/share/bootstrap-bash/lib"
@@ -19,7 +19,8 @@ BOOTSTRAP_DIR_CACHE="/var/bootstrap-bash"
 BOOTSTRAP_DIR_CACHE_RPM="$BOOTSTRAP_DIR_CACHE/rpms"
 BOOTSTRAP_DIR_ROLE=""
 BOOTSTRAP_DIR_TMP="/tmp/bootstrap-bash-$$.tmp"
-BOOTSTRAP_BASEARCH=$(/bin/uname -i)
+BOOTSTRAP_BASEARCH=$(/bin/uname --hardware-platform)
+BOOTSTRAP_PROCARCH=$(/bin/uname --processor)
 BOOTSTRAP_MODULE_NAMES=( )
 BOOTSTRAP_GETOPT_CONFIG=""
 BOOTSTRAP_GETOPT_DRYRUN=0
@@ -269,7 +270,7 @@ fi
 [ -d "$BOOTSTRAP_DIR_CACHE" ] || bootstrap_die "$BOOTSTRAP_DIR_CACHE: cache directory does not exist"
 
 echo "Executing bootstrap process for $BOOTSTRAP_ROLE role..."
-echo "Platform is $BOOTSTRAP_BASEARCH"
+echo "Platform is $BOOTSTRAP_BASEARCH ($BOOTSTRAP_PROCARCH)"
 
 if [ $BOOTSTRAP_GETOPT_CONFIGONLY -eq 1 ] && [ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ]; then
 	bootstrap_die "Command line options -p and -u cannot be combined"

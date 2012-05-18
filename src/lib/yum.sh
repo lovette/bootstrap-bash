@@ -32,9 +32,9 @@ bootstrap_yum_repos_add()
 		packagefilepath="${moduledir}/yum-packages.txt"
 
 		if [ -f "$packagefilepath" ]; then
-			rpmrepos=$(grep -E "^yum-repo-add:(.+)\.rpm$" "$packagefilepath" | sed -r "s/^yum-repo-add:(.+)/\1/" | sed "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" | tr -s '[:space:]' ' ')
-			txtrepos=$(grep -E "^yum-repo-add:(.+)\.repo$" "$packagefilepath" | sed -r "s/^yum-repo-add:(.+)/\1/" | sed "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" | tr -s '[:space:]' ' ')
-			
+			rpmrepos=$(grep -E "^yum-repo-add:(.+)\.rpm$" "$packagefilepath" | sed -r -e "s/^yum-repo-add:(.+)/\1/" -e "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" -e "s/{BOOTSTRAP_PROCARCH}/${BOOTSTRAP_PROCARCH}/" | tr -s '[:space:]' ' ')
+			txtrepos=$(grep -E "^yum-repo-add:(.+)\.repo$" "$packagefilepath" | sed -r -e "s/^yum-repo-add:(.+)/\1/" -e "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" -e "s/{BOOTSTRAP_PROCARCH}/${BOOTSTRAP_PROCARCH}/" | tr -s '[:space:]' ' ')
+
 			if [ -n "$rpmrepos" ] || [ -n "$txtrepos" ]; then
 				if [ $forced -eq 1 ] || ! bootstrap_modules_check_state "$module" "yum-repo-add"; then
 					[ -n "$rpmrepos" ] && rpms=( "${rpms[@]}" $rpmrepos )
@@ -76,7 +76,7 @@ bootstrap_yum_repos_add()
 			if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
 				BOOTSTRAP_ECHO_STRIPPATH=$BOOTSTRAP_DIR_MODULES
 				bootstrap_file_copy $repopath "/etc/yum.repos.d/${reponame}" "root:root" 644 1
-				sed -i "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" "/etc/yum.repos.d/${reponame}"
+				sed -i -e "s/{BOOTSTRAP_BASEARCH}/${BOOTSTRAP_BASEARCH}/" -e "s/{BOOTSTRAP_PROCARCH}/${BOOTSTRAP_PROCARCH}/" "/etc/yum.repos.d/${reponame}"
 				BOOTSTRAP_ECHO_STRIPPATH=""
 			else
 				echo "+ bootstrap_file_copy ${repopath} to /etc/yum.repos.d/${reponame}"
