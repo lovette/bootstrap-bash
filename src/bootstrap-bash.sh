@@ -269,7 +269,13 @@ if [ $BOOTSTRAP_GETOPT_PRINTMODULES -eq 1 ]; then
 fi
 
 # Create cache directory
-[ -d "$BOOTSTRAP_DIR_CACHE" ] || mkdir -p $BOOTSTRAP_DIR_CACHE
+if [ ! -d "$BOOTSTRAP_DIR_CACHE" ]; then
+	mkdir -p $BOOTSTRAP_DIR_CACHE
+	echo "This is the cache and state directory for bootstrap-bash." > "$BOOTSTRAP_DIR_CACHE/README"
+	echo "You can reference this directory in module scripts as \$BOOTSTRAP_DIR_CACHE." >> "$BOOTSTRAP_DIR_CACHE/README"
+	echo "Modifying the contents of this directory will cause modules to be reinstalled." >> "$BOOTSTRAP_DIR_CACHE/README"
+fi
+
 [ -d "$BOOTSTRAP_DIR_CACHE" ] || bootstrap_die "$BOOTSTRAP_DIR_CACHE: cache directory does not exist"
 
 echo "Executing bootstrap process for $BOOTSTRAP_ROLE role..."
