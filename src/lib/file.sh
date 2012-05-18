@@ -10,7 +10,7 @@
 # bootstrap_file_chmod(path, perms)
 # Set permissions of path to perms
 # No-op if perms is 0
-bootstrap_file_chmod()
+function bootstrap_file_chmod()
 {
 	local filepath=$1
 	local filemod=$2
@@ -24,7 +24,7 @@ bootstrap_file_chmod()
 # bootstrap_file_chown(path, owner)
 # Change ownership of path to owner
 # No-op if owner is empty string
-bootstrap_file_chown()
+function bootstrap_file_chown()
 {
 	local filepath=$1
 	local fileowner=$2
@@ -39,7 +39,7 @@ bootstrap_file_chown()
 # bootstrap_mkdir(path, owner, perms)
 # Create directory with permissions set to perms
 # No-op if directory exists
-bootstrap_mkdir()
+function bootstrap_mkdir()
 {
 	local dirpath=$1
 	local dirmod=
@@ -65,7 +65,7 @@ bootstrap_mkdir()
 # Download url and save as path
 # Local save directory will be created if it does not exist
 # No-op if path exists
-bootstrap_file_wget()
+function bootstrap_file_wget()
 {
 	local geturl=$1
 	local localfile=$2
@@ -92,7 +92,7 @@ bootstrap_file_wget()
 # Untars path into targetdir and sets ownership to owner
 # The first component of the paths in the tarfile will be stripped
 # No-op if targetdir already exists
-bootstrap_file_untar()
+function bootstrap_file_untar()
 {
 	local tarfile=$1
 	local targetdir=$2
@@ -112,7 +112,7 @@ bootstrap_file_untar()
 # Sets ownership to owner and permissions to perms
 # No-op if srcpath does not exist
 # No-op if destpath exists unless overwrite is non-zero
-bootstrap_file_move()
+function bootstrap_file_move()
 {
 	local srcpath=$1
 	local destpath=$2
@@ -148,7 +148,7 @@ bootstrap_file_move()
 # Sets ownership to owner and permissions to perms
 # Overwrite: 0=never, 1=always, 2=if src is newer
 # No-op if destpath exists unless overwrite is non-zero
-bootstrap_file_copy()
+function bootstrap_file_copy()
 {
 	local srcpath=$1
 	local destpath=$2
@@ -194,7 +194,7 @@ bootstrap_file_copy()
 # bootstrap_file_copy_glob(srcdir, destdir, glob, owner, perms, overwrite, removesuffix)
 # Copies srcdir/glob as destdir/file
 # See bootstrap_file_copy for description of owner, perms, overwrite
-bootstrap_file_copy_glob()
+function bootstrap_file_copy_glob()
 {
 	local srcdir=$1
 	local destdir=$2
@@ -225,7 +225,7 @@ bootstrap_file_copy_glob()
 # bootstrap_file_link(path, target, perms)
 # Create path as a soft link to target with perms permissions
 # Will fail if path directory does not exist
-bootstrap_file_link()
+function bootstrap_file_link()
 {
 	local linkpath=$1
 	local target=$2
@@ -248,7 +248,7 @@ bootstrap_file_link()
 # Create empty file path
 # Sets ownership to owner and permissions to perms
 # No-op if path exists
-bootstrap_file_create()
+function bootstrap_file_create()
 {
 	local filepath=$1
 	local fileowner=$2
@@ -266,7 +266,7 @@ bootstrap_file_create()
 # bootstrap_file_remove(path)
 # Remove file path
 # No-op if path does not exist
-bootstrap_file_remove()
+function bootstrap_file_remove()
 {
 	local filepath=$1
 
@@ -281,7 +281,7 @@ bootstrap_file_remove()
 # Returns file contents in $get_file_contents_return global variable
 # Comments are excluded
 # No-op if path is empty string or does not exist
-bootstrap_file_get_contents_list()
+function bootstrap_file_get_contents_list()
 {
 	get_file_contents_return=""
 
@@ -295,7 +295,7 @@ bootstrap_file_get_contents_list()
 # bootstrap_dir_chmod(path, dirperms, fileperms)
 # Set permissions of directory and subdirectories to dirperms and files to fileperms
 # No-op if perms is 0
-bootstrap_dir_chmod()
+function bootstrap_dir_chmod()
 {
 	local dirpath=$1
 	local dirmod=$2
@@ -315,7 +315,7 @@ bootstrap_dir_chmod()
 # bootstrap_dir_chown(path, owner)
 # Change ownership of directory and contents to owner
 # No-op if owner is empty string
-bootstrap_dir_chown()
+function bootstrap_dir_chown()
 {
 	local dirpath=$1
 	local dirowner=$2
@@ -331,7 +331,7 @@ bootstrap_dir_chown()
 # Sets ownership to owner, directory permissions to dirperms and file permissions to fileperms
 # Overwrite: 0=never, 1=copy, 2=rmdir before copy
 # No-op if destpath exists unless overwrite is non-zero
-bootstrap_dir_copy()
+function bootstrap_dir_copy()
 {
 	local srcpath=$1
 	local destpath=$2

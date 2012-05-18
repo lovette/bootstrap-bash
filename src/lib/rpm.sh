@@ -8,7 +8,7 @@
 # Available from https://github.com/lovette/bootstrap-bash
 
 # bootstrap_rpm_packages_install(array of module names)
-bootstrap_rpm_packages_install()
+function bootstrap_rpm_packages_install()
 {
 	local modules=( "$@" )
 	local module=""

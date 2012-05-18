@@ -9,7 +9,7 @@
 
 # bootstrap_modules_set_state(module name, action)
 # Creates module state file for an action
-bootstrap_modules_set_state()
+function bootstrap_modules_set_state()
 {
 	local module=$1
 	local action=$2
@@ -28,7 +28,7 @@ bootstrap_modules_set_state()
 
 # bootstrap_modules_check_state(module name, action)
 # Returns success if module state file exists for an action
-bootstrap_modules_check_state()
+function bootstrap_modules_check_state()
 {
 	local module=$1
 	local action=$2
@@ -41,7 +41,7 @@ bootstrap_modules_check_state()
 
 # bootstrap_modules_clear_state(module name, action)
 # Deletes module state file for an action
-bootstrap_modules_clear_state()
+function bootstrap_modules_clear_state()
 {
 	local module=$1
 	local action=$2
@@ -53,7 +53,7 @@ bootstrap_modules_clear_state()
 
 # bootstrap_modules_reset_states(module name)
 # Deletes state files for all actions for a module
-bootstrap_modules_reset_states()
+function bootstrap_modules_reset_states()
 {
 	local module=$1
 	local BOOTSTRAP_DIR_MODULE_CACHE="${BOOTSTRAP_DIR_CACHE}/module-${module}"
@@ -63,14 +63,14 @@ bootstrap_modules_reset_states()
 
 # bootstrap_modules_reset_states_all()
 # Deletes all state files for all modules
-bootstrap_modules_reset_states_all()
+function bootstrap_modules_reset_states_all()
 {
 	find "${BOOTSTRAP_DIR_CACHE}" -mindepth 1 -maxdepth 1 -print0 | xargs -r -0 /bin/rm -rf
 }
 
 # bootstrap_modules_is_installed(module name)
 # Returns success if any actions have been taken for a module
-bootstrap_modules_is_installed()
+function bootstrap_modules_is_installed()
 {
 	local module=$1
 	local BOOTSTRAP_DIR_MODULE_CACHE="${BOOTSTRAP_DIR_CACHE}/module-${module}"
@@ -87,7 +87,7 @@ bootstrap_modules_is_installed()
 # - module_version_desc = description
 # - module_version_ver  = version
 # Value is set to "-" if version information is not available
-bootstrap_modules_get_version_info()
+function bootstrap_modules_get_version_info()
 {
 	local module=$1
 	local verfilepath="${BOOTSTRAP_DIR_MODULES}/${module}/version.txt"
@@ -106,7 +106,7 @@ bootstrap_modules_get_version_info()
 # bootstrap_modules_build_list()
 # Build list of modules based on the active role
 # Return value is the global array BOOTSTRAP_MODULE_NAMES
-bootstrap_modules_build_list()
+function bootstrap_modules_build_list()
 {
 	local file=""
 	local modulefiles=( )
@@ -138,7 +138,7 @@ bootstrap_modules_build_list()
 }
 
 # bootstrap_modules_scan(array of module names)
-bootstrap_modules_scan()
+function bootstrap_modules_scan()
 {
 	local module=""
 	local modules=( "$@" )
@@ -154,7 +154,7 @@ bootstrap_modules_scan()
 }
 
 # bootstrap_modules_script_exec(name, install.sh path)
-bootstrap_modules_script_exec()
+function bootstrap_modules_script_exec()
 {
 	local BOOTSTRAP_MODULE_NAME=$1
 	local script=$2
@@ -187,7 +187,7 @@ bootstrap_modules_script_exec()
 }
 
 # bootstrap_modules_preinstall(array of module names)
-bootstrap_modules_preinstall()
+function bootstrap_modules_preinstall()
 {
 	local module=""
 	local modules=( "$@" )
@@ -214,7 +214,7 @@ bootstrap_modules_preinstall()
 }
 
 # bootstrap_modules_config(array of module names)
-bootstrap_modules_config()
+function bootstrap_modules_config()
 {
 	local module=""
 	local modules=( "$@" )
@@ -236,7 +236,7 @@ bootstrap_modules_config()
 }
 
 # bootstrap_modules_install(array of module names)
-bootstrap_modules_install()
+function bootstrap_modules_install()
 {
 	local module=""
 	local modules=( "$@" )

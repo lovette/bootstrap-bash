@@ -10,7 +10,7 @@
 
 # bootstrap_die(message)
 # Prints optional message and exits with an error code
-bootstrap_die()
+function bootstrap_die()
 {
 	local message="$1"
 

@@ -10,7 +10,7 @@
 # bootstrap_build_exec(directory, outfile, errprefix, command)
 # Executes a command in a specified directory, saving output to outfile
 # If command fails, output will be displayed and boostrap_die is called
-bootstrap_build_exec()
+function bootstrap_build_exec()
 {
 	local directory="$1"
 	local outfile="$2"
@@ -32,7 +32,7 @@ bootstrap_build_exec()
 # bootstrap_build_make(directory, outfile[, makeargs])
 # Executes "make" in a specified directory, saving output to outfile
 # If make fails, output will be displayed and boostrap_die is called
-bootstrap_build_make()
+function bootstrap_build_make()
 {
 	local directory="$1"
 	local outfile="$2"
@@ -46,7 +46,7 @@ bootstrap_build_make()
 # bootstrap_build_configure(directory, outfile[, cmdargs])
 # Executes "configure" in a specified directory, saving output to outfile
 # If configure fails, output will be displayed and boostrap_die is called
-bootstrap_build_configure()
+function bootstrap_build_configure()
 {
     local directory="$1"
     local outfile="$2"

@@ -8,7 +8,7 @@
 # Available from https://github.com/lovette/bootstrap-bash
 
 # bootstrap_yum_repos_add(array of module names)
-bootstrap_yum_repos_add()
+function bootstrap_yum_repos_add()
 {
 	local modules=( "$@" )
 	local rpms=( )
@@ -96,7 +96,7 @@ bootstrap_yum_repos_add()
 }
 
 # bootstrap_yum_packages_remove(array of module names)
-bootstrap_yum_packages_remove()
+function bootstrap_yum_packages_remove()
 {
 	local modules=( "$@" )
 	local packages=( )
@@ -153,7 +153,7 @@ bootstrap_yum_packages_remove()
 }
 
 # bootstrap_yum_packages_install(array of module names)
-bootstrap_yum_packages_install()
+function bootstrap_yum_packages_install()
 {
 	local modules=( "$@" )
 	local packages=( )

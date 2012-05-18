@@ -10,7 +10,7 @@
 
 # bootstrap_die(message)
 # Prints optional message and exits with an error code
-bootstrap_die()
+function bootstrap_die()
 {
 	local message="$1"
 
@@ -21,7 +21,7 @@ bootstrap_die()
 
 # bootstrap_echo_header(message)
 # Prints section header message, with color if BOOTSTRAP_TTYHEADER is set
-bootstrap_echo_header()
+function bootstrap_echo_header()
 {
 	local message="$1"
 

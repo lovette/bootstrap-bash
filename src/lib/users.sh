@@ -9,14 +9,14 @@
 
 # bootstrap_user_exists(name)
 # Returns nonzero if user name exists
-bootstrap_user_exists()
+function bootstrap_user_exists()
 {
 	/usr/bin/id "$1" &>/dev/null
 }
 
 # bootstrap_user_group_exists(name)
 # Returns nonzero if the group name exists
-bootstrap_user_group_exists()
+function bootstrap_user_group_exists()
 {
 	/usr/bin/id -g "$1" &>/dev/null
 }
@@ -24,7 +24,7 @@ bootstrap_user_group_exists()
 # bootstrap_user_group_add(uid, name)
 # Add a user group
 # Exits if the group cannot be added
-bootstrap_user_group_add()
+function bootstrap_user_group_add()
 {
 	local ADDGID=$1
 	local GNAME=$2
@@ -38,7 +38,7 @@ bootstrap_user_group_add()
 # bootstrap_user_add_system(uid, name, comment, home)
 # Add an account for a daemon which has no login rights
 # Exits if the user cannot be added
-bootstrap_user_add_system()
+function bootstrap_user_add_system()
 {
 	local ADDUID="$1"
 	local UNAME="$2"
@@ -57,7 +57,7 @@ bootstrap_user_add_system()
 # Add an account for a person who has login rights
 # Exits if the user cannot be added
 # Requires Perl be installed so password can be encrypted
-bootstrap_user_add_login()
+function bootstrap_user_add_login()
 {
 	local ADDUID="$1"
 	local UNAME="$2"
