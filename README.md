@@ -1,12 +1,54 @@
 # bootstrap-bash
 
-A simple server bootstrap and configuration framework based on BASH scripts.
+A simple server kickstart and software configuration tool.
 
+
+Overview
+---
+There are a lot of ways to kickstart a server and manage software configurations.
+The most basic (and probably most future-proof) is to rely only on shell scripts
+and package managers. This tool makes the task of configuring servers and software as easy
+as creating directories that contain shell scripts and files listing packages
+to install or remove.
+
+If you're looking for more power or automation, have a look at these tools:
+
+* [Chef](http://www.opscode.com/chef/)
+* [Puppet](http://puppetlabs.com/)
+* [Ansible](http://ansible.github.com/)
+
+
+### Basic Example
+
+Here are the commands you might execute in a shell to build PHP CLI SAPI:
+
+	cd /tmp
+	wget http://us.php.net/distributions/php-5.3.6.tar.gz
+	tar xvfz php-5.3.6.tar.gz
+	cd php-5.3.6
+	./configure
+	make
+	make install
+
+Or, if you want better error handling, progress output and an audit trail,
+you can take this one step further and use some built-in convenience functions:
+
+	bootstrap_file_wget  http://us.php.net/distributions/php-5.3.6.tar.gz /tmp/php-5.3.6.tar.gz
+	bootstrap_file_untar /tmp/php-5.3.6.tar.gz /tmp/php-5.3.6 root:root
+	bootstrap_build_exec /tmp/php-5.3.6 configure.out make ./configure
+	bootstrap_build_make /tmp/php-5.3.6 make.out
+	bootstrap_build_make /tmp/php-5.3.6 make-install.out install
+
+Save either set of commands to a file named `install.sh` in a directory
+called `php-cli` and you now have a "module" to build the PHP CLI SAPI.
+Repeat this process to create a module for each server component or software package
+you want to manage and bootstrap-bash will take care of running specific
+modules based on the selected server "role".
 
 Requirements
 ---
 
-* [BASH 3.0 or later](http://www.gnu.org/software/bash/)
+* [BASH 3.0 or later](http://www.gnu.org/software/bash/) or compatible shell
 
 
 Installation
@@ -35,113 +77,82 @@ Run the command with `--help` argument or see bootstrap-bash(8) for available OP
 
 Getting Started
 ---
+Getting started is easy.
 
-### Configuration File
+1. Create a configuration file
+2. Create a directory containing one or more modules
+3. Create a directory containing one or more roles
 
-The configuration file specified by `-c` must be a BASH script that at minimum
-defines the following two constants:
+
+Configuration File
+---
+The configuration file is a shell script that at minimum defines the following two variables:
 
 	BOOTSTRAP_DIR_MODULES="/path/to/modules directory"
 	BOOTSTRAP_DIR_ROLES="/path/to/roles directory"
 
-The script can also define (and export) any other constants that the module
+These default variables may be overridden if necessary:
+
+	BOOTSTRAP_DIR_LIB="/usr/share/bootstrap-bash/lib"
+	BOOTSTRAP_DIR_CACHE="/var/bootstrap-bash"
+	BOOTSTRAP_DIR_CACHE_RPM="$BOOTSTRAP_DIR_CACHE/rpms"
+	BOOTSTRAP_DIR_TMP="/tmp/bootstrap-bash-$$.tmp"
+
+The script can also define (and export) any other global variables that the module
 installation scripts need to reference.
 
-### Directory Structure
 
-Each module available must be a subdirectory below a root modules directory.
+Modules
+---
+Each available module must be a subdirectory below a root modules directory.
+Each module directory contains one or more files that control the installation,
+configuration and package management for the module.
 
 	modules/
 	|- <module name>/
-	   |-- version.txt      - Module information (optional)
-	   |-- preinstall.sh    - BASH script to execute before modules are installed (optional)
-	   |-- install.sh       - BASH script to execute to install module (optional)
-	   |-- config.sh        - BASH script to execute to configure module (optional)
-	   |-- yum-packages.txt - Yum packages to install or remove (optional)
-	   |-- rpm-packages.txt - RPM packages to install or remove (optional)
 
-Each role available must be a subdirectory below a root roles directory.
+### Files
+Each module directory contains one or more shell scripts or text files that
+define the module operations.
 
-	roles/
-	|- modules.txt          - Modules to install for ALL roles (optional)
-	|- <role>/
-	   |-- modules.txt      - Modules to install for role <role>
+#### version.txt
 
-Role directories can have subdirectories. For example, you could define "server" roles below
-"development" and "public" roles. The modules.txt file in each parent directory
-above the leaf role will be applied.
-
-### version.txt
-
-Each module can have a text file that describes the module.
+Text file that provides metadata to describe the module.
 
 	Description: Module description
 	Version: 1.0
 
+#### preinstall.sh
 
-Package Management
----
+Shell script to execute before modules are installed. This script is executed
+before package management and other module scripts.
+This script is not executed if bootstrap-bash is run in update configurations mode.
 
-### YUM
+#### install.sh
+
+Shell script with commands and functions to install the software related
+to the module. This script is executed after `preinstall.sh` and package management
+and before `config.sh`. This script is not executed if bootstrap-bash is run in
+update configurations mode.
+
+#### config.sh
+
+Shell script to execute to configure module. This script is executed
+after `install.sh`. Only this script is executed if bootstrap-bash is run in
+update configurations mode.
 
 #### yum-packages.txt
 
-This file lists all packages that should be installed or removed with `yum`.
-
-Each line should contain the name of a package to install or remove.
-Blank lines and comment lines beginning with "#" will be ignored.
-Packages that should be removed must be prefixed with "-" (e.g. "-package").
-All other lines in the file will be considered a package name and installed.
-Packages that need to be installed from a specific repository can be prefixed
-with the repo name as: repo/package.
-
-Yum repositories that packages are installed from can be added to yum.repos.d
-automatically using the "yum-repo-add:" tag. This will install an RPM to update
-the repolist or copy a local file to yum.repos.d.
-
-Add RPMs via a URL or local file with this syntax:
-
-	yum-repo-add:<URL or path>.rpm
-
-Add local files with this syntax:
-(If the path is relative, it will be prepended with the module directory.)
-
-	yum-repo-add:<path>.repo
-
-If you need a custom repository that does not follow these conventions, 
-you can modify yum.repos.d in a preinstall script. You can reference
-the hardware architecture (e.g. i386, x86_64) with the tag {BOOTSTRAP_BASEARCH}
-or the processor architecture (e.g. i686, x86_64) with {BOOTSTRAP_PROCARCH}.
-
-### RPM
+Text file listing Yum packages to install or remove. See Package Management for details.
 
 #### rpm-packages.txt
 
-This file lists all packages that should be installed with `rpm` directly.
+Text file listing RPM packages to install or remove. See Package Management for details.
 
-Each line should contain the URL (HTTP or FTP) or local file path to a .rpm file.
-(If the path is relative, it will be prepended with the module directory.)
+### Variables
 
-Non-local RPMs will be downloaded with `wget` and saved to the directory
-specified by BOOTSTRAP_DIR_CACHE_RPM. The default directory is BOOTSTRAP_DIR_CACHE/rpms.
-
-Blank lines and comment lines beginning with "#" will be ignored.
-
-### Other package management tools
-
-The framework is not dependent on Yum and can easily be expanded to support
-other package management tools.
-
-
-Module Installation
----
-
-### preinstall.sh, install.sh, config.sh
-
-The module install scripts are BASH scripts that execute commands and functions
-to install the software related to the module.
-
-The following global variables are available to the script:
+The following global variables are available to `preinstall.sh`, `install.sh`
+and `config.sh` scripts:
 
 * `BOOTSTRAP_MODULE_NAME` - The name of the module being installed
 * `BOOTSTRAP_ROLE` - The active role being installed
@@ -154,7 +165,92 @@ The following global variables are available to the script:
 * `BOOTSTRAP_DIR_TMP` - The directory where temporary files can be saved
 
 
-How it works
+Roles
+---
+Each available role must be a subdirectory below a root roles directory.
+
+	roles/
+	|- <role>/
+	   |-- <subrole>/
+
+Each role directory can have subdirectories that define a "subrole".
+For example, you could define the top-level roles "development" and "public".
+Beneath each of those roles you could have a subrole for each specific type of
+server, such as "web" and "database".
+
+### Files
+Each role directory contains a text file that defines the role modules.
+
+#### modules.txt
+
+Text file listing names of modules that will be applied for the role.
+Blank lines and comment lines beginning with "#" will be ignored.
+The `modules.txt` file in each directory above a subrole will be applied when
+a role is selected. This allows for common modules to be defined in common role directories.
+
+
+Package Management
+---
+Modules can contain text files defining package management operations.
+
+Packages are removed after they are added so dependencies on removed packages
+can be fulfilled by new packages (as when replacing syslogd with rsyslogd).
+Packages without dependency management (ie. individual RPMs) are installed last
+so dependencies can be managed through a package manager.
+
+### YUM
+
+`yum-packages.txt` lists all packages that should be installed or removed with `yum`.
+
+#### Packages
+
+Each line should contain the name of a package to install or remove.
+Blank lines and comment lines beginning with "#" will be ignored.
+Packages that should be removed must be prefixed with "-" (e.g. "-package").
+All other lines in the file will be considered a package name and installed.
+Packages that need to be installed from a specific repository can be prefixed
+with the repo name as: repo/package.
+
+#### Repositories
+
+Yum repositories that packages are installed from can be added to `/etc/yum.repos.d`
+automatically using the "yum-repo-add:" tag. This tag can either install an RPM to update
+the repolist or copy a local file to yum.repos.d.
+
+Add RPMs via a URL or local file with this syntax:
+
+	yum-repo-add:<URL or path>.rpm
+
+Add local files with this syntax:
+(If the path is relative, it will be prepended with the module directory.)
+
+	yum-repo-add:<path>.repo
+
+If you need a custom repository that does not follow these conventions,
+you can modify yum.repos.d with `preinstall.sh`.
+
+`yum-repo-add` statements and repo configuration text files can reference
+the hardware architecture (e.g. i386, x86_64) with the tag {BOOTSTRAP_BASEARCH}
+or the processor architecture (e.g. i686, x86_64) with {BOOTSTRAP_PROCARCH}.
+
+### RPM
+
+`rpm-packages.txt` lists all packages that should be installed with `rpm` directly.
+
+Each line should contain the URL (HTTP or FTP) or local file path to a .rpm file.
+(If the path is relative, it will be prepended with the module directory.)
+Blank lines and comment lines beginning with "#" will be ignored.
+
+Non-local RPMs will be downloaded with `wget` and saved to the directory
+specified by BOOTSTRAP_DIR_CACHE_RPM.
+
+### Other package management tools
+
+The framework is not dependent on Yum and can easily be expanded to support
+other package management tools.
+
+
+Order of operations
 ---
 1. Modules are enumerated based on role, unless specified on the command line
 2. Module preinstall scripts are executed (preinstall.sh)
@@ -162,9 +258,5 @@ How it works
 4. Yum packages are installed (yum-packages.txt)
 5. Yum packages are removed (yum-packages.txt)
 6. RPM packages are installed (rpm-packages.txt)
-7. Module install scripts are executed (install.sh then config.sh)
-
-Packages are removed after they are added so dependencies on removed packages
-can be fulfilled by new packages (as when replacing syslogd with rsyslogd).
-Packages without dependency management (ie. individual RPMs) are installed last
-so dependencies can be managed through a package manager.
+7. Module install scripts are executed (install.sh)
+8. Module configuration scripts are executed (config.sh)
