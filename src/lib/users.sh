@@ -40,7 +40,7 @@ function bootstrap_user_group_add()
 
 	if ! bootstrap_user_group_exists $GNAME; then
 		/usr/sbin/groupadd -g "$ADDGID" "$GNAME"
-		[ $? -ne 0 ] && boostrap_die
+		[ $? -ne 0 ] && bootstrap_die
 	fi
 }
 
@@ -62,7 +62,7 @@ function bootstrap_user_add_system()
 	if ! bootstrap_user_exists $UNAME; then
 		bootstrap_user_group_add $ADDUID $UNAME
 		/usr/sbin/useradd -M -r -n -u $ADDUID -g $UNAME -c "$UCOMMENT" -d "$UHOME" -s /sbin/nologin $UNAME
-		[ $? -ne 0 ] && boostrap_die
+		[ $? -ne 0 ] && bootstrap_die
 		echo " * created user ${UNAME} (no login)"
 	fi
 }
@@ -87,7 +87,7 @@ function bootstrap_user_add_login()
 	if ! bootstrap_user_exists $UNAME; then
 		bootstrap_user_group_add $ADDUID $UNAME
 		/usr/sbin/useradd -u $ADDUID -g $UNAME -c "$UCOMMENT" -m -n -s /bin/bash -G users -p $UPASSCRYPT $UNAME
-		[ $? -ne 0 ] && boostrap_die
+		[ $? -ne 0 ] && bootstrap_die
 		# Force password change on next login
 		/usr/bin/chage -d 0 $UNAME
 		echo " * created user ${UNAME} (login)"

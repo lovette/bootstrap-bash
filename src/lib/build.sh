@@ -26,8 +26,8 @@ function bootstrap_build_exec()
 
 	echo " * executing '$cmd' in $directory"
 
-	[ -d "$directory" ] || boostrap_die "$directory: directory does not exist"
-	[ -w "$directory" ] || boostrap_die "$directory: directory is not writable"
+	[ -d "$directory" ] || bootstrap_die "$directory: directory does not exist"
+	[ -w "$directory" ] || bootstrap_die "$directory: directory is not writable"
 
 	(cd $directory && $cmd &> $outfile)
 	if [ $? -ne 0 ]; then
