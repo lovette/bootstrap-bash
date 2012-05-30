@@ -67,5 +67,5 @@ function bootstrap_build_configure()
 
 	[ $# -ge 3 ] && cmd="$cmd $3"
 
-	bootstrap_build_exec $directory $outfile "make" "$cmd"
+	bootstrap_build_exec $directory $outfile "configure" "$cmd"
 }
