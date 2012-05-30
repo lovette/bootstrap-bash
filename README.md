@@ -164,6 +164,13 @@ and `config.sh` scripts:
 * `BOOTSTRAP_DIR_MODULE_CACHE` - The directory where module installation state is saved
 * `BOOTSTRAP_DIR_TMP` - The directory where temporary files can be saved
 
+### Exit Status
+
+Module scripts must exit with a zero status if successful. A non-zero exit status
+causes bootstrap-bash to stop execution. The default exit status of a script is that of
+the last command executed, so an explicit call to `exit` is typically not required.
+You can use the convenience function `bootstrap_die` to exit with an error message.
+
 
 Roles
 ---
