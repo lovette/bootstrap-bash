@@ -1,0 +1,32 @@
+/*! @mainpage notitle
+*
+* Modules can reference a library of convenience functions. Libraries are referenced
+* using the `source` shell script command.
+*
+* It is recommended (but not required) that all module scripts include module-common.sh
+* at the beginning of the script, even if they don't reference any convenience
+* functions.
+*
+* @section example_module Example module
+*
+* @code
+*
+* source ${BOOTSTRAP_DIR_LIB}/module-common.sh
+* source ${BOOTSTRAP_DIR_LIB}/file.sh
+* source ${BOOTSTRAP_DIR_LIB}/build.sh
+*
+* bootstrap_file_wget  http://us.php.net/distributions/php-5.3.6.tar.gz /tmp/php-5.3.6.tar.gz
+* bootstrap_file_untar /tmp/php-5.3.6.tar.gz /tmp/php-5.3.6 root:root
+* bootstrap_build_exec /tmp/php-5.3.6 configure.out make ./configure
+* bootstrap_build_make /tmp/php-5.3.6 make.out
+* bootstrap_build_make /tmp/php-5.3.6 make-install.out install
+*
+* @endcode
+*
+* @section availablemodules Available modules:
+*
+* * module-common.sh - @copybrief module-common.sh
+* * build.sh - @copybrief build.sh
+* * file.sh - @copybrief file.sh
+* * users.sh - @copybrief users.sh
+*/

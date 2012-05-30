@@ -6,10 +6,16 @@
 # See the file LICENSE.txt for the full license text.
 #
 # Available from https://github.com/lovette/bootstrap-bash
+#
+##! @file
+##! @brief Convenience functions to manage files and directories
 
-# bootstrap_file_chmod(path, perms)
-# Set permissions of path to perms
-# No-op if perms is 0
+##! @fn bootstrap_file_chmod(string path, string|int perms)
+##! @brief Set file access permissions
+##! @param path File path
+##! @param perms Permissions; `man chmod` for allowed formats
+##! @note No-op if `perms` is 0
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_chmod()
 {
 	local filepath=$1
@@ -21,9 +27,12 @@ function bootstrap_file_chmod()
 	fi
 }
 
-# bootstrap_file_chown(path, owner)
-# Change ownership of path to owner
-# No-op if owner is empty string
+##! @fn bootstrap_file_chown(string path, string owner)
+##! @brief Change file ownership
+##! @param path File path
+##! @param owner New owner
+##! @note No-op if `owner` is empty string
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_chown()
 {
 	local filepath=$1
@@ -35,10 +44,13 @@ function bootstrap_file_chown()
 	fi
 }
 
-# bootstrap_mkdir(path, perms)
-# bootstrap_mkdir(path, owner, perms)
-# Create directory with permissions set to perms
-# No-op if directory exists
+##! @fn bootstrap_mkdir(string path, string owner, string|int perms)
+##! @brief Create directory with specified permissions and ownership
+##! @param path New directory path; all path components will be created
+##! @param owner (optional) Directory owner; set to empty string for default
+##! @param perms File permissions; `man chmod` for allowed formats; set to 0 for default
+##! @note No-op if directory already exists
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_mkdir()
 {
 	local dirpath=$1
@@ -61,10 +73,17 @@ function bootstrap_mkdir()
 	fi
 }
 
-# bootstrap_wget(url, path[, args])
-# Download url and save as path
-# Local save directory will be created if it does not exist
-# No-op if path exists
+##! @fn bootstrap_file_wget(string url, string path, string args)
+##! @brief Download URL with `wget` and save to file
+##! @param url URL to download
+##! @param path File path to save as
+##! @param args (optional) Additional `wget` command line arguments
+##! @note Save path directory will be created if it does not exist
+##! @note Save path will not be modified unless `wget` succeeds
+##! @note Temporary file is downloaded to directory `BOOTSTRAP_DIR_TMP`
+##! @note File name in URL is ignored
+##! @note No-op if `path` exists
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_wget()
 {
 	local geturl=$1
@@ -88,10 +107,15 @@ function bootstrap_file_wget()
 	fi
 }
 
-# bootstrap_untar(path, targetdir, owner)
-# Untars path into targetdir and sets ownership to owner
-# The first component of the paths in the tarfile will be stripped
-# No-op if targetdir already exists
+##! @fn bootstrap_file_untar(string path, string targetdir, string owner)
+##! @brief Extract compressed "tarfile" archive into a directory.
+##! @param path Archive file path
+##! @param targetdir Directory in which to extract archive files
+##! @param owner New directory and file ownership; set to empty string for default
+##! @note The first path component of the paths in the archive will be stripped
+##! @note No-op if `targetdir` already exists
+##! @note Target directory will be created with permissions 755
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_untar()
 {
 	local tarfile=$1
@@ -107,11 +131,17 @@ function bootstrap_file_untar()
 	fi
 }
 
-# bootstrap_file_move(srcpath, destpath, owner, perms, overwrite)
-# Moves srcpath to destpath
-# Sets ownership to owner and permissions to perms
-# No-op if srcpath does not exist
-# No-op if destpath exists unless overwrite is non-zero
+##! @fn bootstrap_file_move(string srcpath, string destpath, string owner, string|int perms, int overwrite)
+##! @brief Move or rename a file
+##! @param srcpath Source file path
+##! @param destpath Destination file path
+##! @param owner New file ownership; set to empty string to preserve
+##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
+##! @param overwrite Overwrite mode: 0=never, 1=always
+##! @note No-op if `srcpath` does not exist
+##! @note No-op if `destpath` exists unless `overwrite` is non-zero
+##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_move()
 {
 	local srcpath=$1
@@ -143,11 +173,17 @@ function bootstrap_file_move()
 	fi
 }
 
-# bootstrap_file_copy(srcpath, destpath, owner, perms, overwrite)
-# Copies srcpath as destpath
-# Sets ownership to owner and permissions to perms
-# Overwrite: 0=never, 1=always, 2=if src is newer
-# No-op if destpath exists unless overwrite is non-zero
+##! @fn bootstrap_file_copy(string srcpath, string destpath, string owner, string|int perms, int overwrite)
+##! @brief Copy a file
+##! @param srcpath Source file path
+##! @param destpath Destination file path
+##! @param owner New file ownership; set to empty string to preserve
+##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
+##! @param overwrite Overwrite mode: 0=never, 1=always, 2=if file size has changed
+##! @note No-op if `destpath` exists unless `overwrite` is non-zero
+##! @note Timestamps are preserved
+##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_copy()
 {
 	local srcpath=$1
@@ -191,9 +227,19 @@ function bootstrap_file_copy()
 	fi
 }
 
-# bootstrap_file_copy_glob(srcdir, destdir, glob, owner, perms, overwrite, removesuffix)
-# Copies srcdir/glob as destdir/file
-# See bootstrap_file_copy for description of owner, perms, overwrite
+##! @fn bootstrap_file_copy_glob(string srcdir, string destdir, string glob, string owner, string|int perms, int overwrite, string removesuffix)
+##! @brief Copy contents of one directory to another using `bootstrap_file_copy`.
+##! @param srcdir Source directory path
+##! @param destdir Destination directory path
+##! @param glob File pattern (e.g * or *.txt)
+##! @param owner New file ownership; set to empty string to preserve
+##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
+##! @param overwrite Overwrite mode: 0=never, 1=always, 2=if file size has changed
+##! @param removesuffix File name suffix to remove in destination path
+##! @note `srcdir` must exist and be readable
+##! @note `destdir` must exist and be writable
+##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_copy_glob()
 {
 	local srcdir=$1
@@ -222,9 +268,15 @@ function bootstrap_file_copy_glob()
 	done
 }
 
-# bootstrap_file_link(path, target, perms)
-# Create path as a soft link to target with perms permissions
-# Will fail if path directory does not exist
+##! @fn bootstrap_file_link(string linkpath, string target, string|int perms)
+##! @brief Create a soft link.
+##! @param linkpath New link path
+##! @param target Existing target path
+##! @param perms New link permissions; `man chmod` for allowed formats; set to 0 to preserve
+##! @note Directory containing `linkpath` must exist
+##! @note `target` path must exist
+##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_link()
 {
 	local linkpath=$1
@@ -244,10 +296,13 @@ function bootstrap_file_link()
 	echo " * linked ${linkpath} to $target"
 }
 
-# bootstrap_file_create(path, owner, perms)
-# Create empty file path
-# Sets ownership to owner and permissions to perms
-# No-op if path exists
+##! @fn bootstrap_file_create(string path, string owner, string|int perms)
+##! @brief Create empty file using `touch`.
+##! @param path New file path
+##! @param owner New file ownership; set to empty string for default
+##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 for default
+##! @note No-op if `path` exists
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_create()
 {
 	local filepath=$1
@@ -263,9 +318,11 @@ function bootstrap_file_create()
 	fi
 }
 
-# bootstrap_file_remove(path)
-# Remove file path
-# No-op if path does not exist
+##! @fn bootstrap_file_remove(string path)
+##! @brief Remove file
+##! @param path File path
+##! @note No-op if `path` does not exist
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_remove()
 {
 	local filepath=$1
@@ -277,10 +334,12 @@ function bootstrap_file_remove()
 	fi
 }
 
-# bootstrap_file_get_contents_list(path)
-# Returns file contents in $get_file_contents_return global variable
-# Comments are excluded
-# No-op if path is empty string or does not exist
+##! @fn bootstrap_file_get_contents_list(string path)
+##! @brief Read file contents into a variable.
+##! @param path File path
+##! @note Returns file contents in global variable `$get_file_contents_return`
+##! @note Lines beginning with "#" are considered comments and are excluded
+##! @note No-op if `path` is empty string or does not exist
 function bootstrap_file_get_contents_list()
 {
 	get_file_contents_return=""
@@ -292,9 +351,12 @@ function bootstrap_file_get_contents_list()
 	fi
 }
 
-# bootstrap_dir_chmod(path, dirperms, fileperms)
-# Set permissions of directory and subdirectories to dirperms and files to fileperms
-# No-op if perms is 0
+##! @fn bootstrap_dir_chmod(string path, string dirperms, string fileperms)
+##! @brief Recursively set permissions of a directory its contents
+##! @param path Directory path
+##! @param dirperms New directory permissions; `man chmod` for allowed formats; set to 0 to preserve
+##! @param fileperms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_dir_chmod()
 {
 	local dirpath=$1
@@ -312,9 +374,12 @@ function bootstrap_dir_chmod()
 	fi
 }
 
-# bootstrap_dir_chown(path, owner)
-# Change ownership of directory and contents to owner
-# No-op if owner is empty string
+##! @fn bootstrap_dir_chown(string path, string owner)
+##! @brief Recursively change ownership of a directory and its contents
+##! @param path Directory path
+##! @param owner New owner
+##! @note No-op if `owner` is empty string
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_dir_chown()
 {
 	local dirpath=$1
@@ -326,11 +391,19 @@ function bootstrap_dir_chown()
 	fi
 }
 
-# bootstrap_dir_copy(srcpath, destpath, owner, dirperms, fileperms, overwrite)
-# Copies srcpath directory as destpath
-# Sets ownership to owner, directory permissions to dirperms and file permissions to fileperms
-# Overwrite: 0=never, 1=copy, 2=rmdir before copy
-# No-op if destpath exists unless overwrite is non-zero
+##! @fn bootstrap_dir_copy(string srcpath, string destpath, string owner, string dirperms, string fileperms, int overwrite)
+##! @brief Copy directory and contents.
+##! @param srcpath Source directory path
+##! @param destpath Destination directory path
+##! @param owner New file ownership; set to empty string to preserve
+##! @param dirperms New directory permissions; man chmod for allowed formats; set to 0 to preserve
+##! @param fileperms New file permissions; man chmod for allowed formats; set to 0 to preserve
+##! @param overwrite Overwrite mode: 0=never, 1=always, 2=rmdir before copy
+##! @note No-op if `destpath` exists unless `overwrite` is non-zero
+##! @note Timestamps are preserved
+##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
+##! @warning Be careful when using `overwrite=2` as `destpath` is recursively removed before copy.
+##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_dir_copy()
 {
 	local srcpath=$1

@@ -6,10 +6,17 @@
 # See the file LICENSE.txt for the full license text.
 #
 # Available from https://github.com/lovette/bootstrap-bash
+#
+##! @file
+##! @brief Convenience functions to manage build processes
 
-# bootstrap_build_exec(directory, outfile, errprefix, command)
-# Executes a command in a specified directory, saving output to outfile
-# If command fails, output will be displayed and boostrap_die is called
+##! @fn bootstrap_build_exec(string directory, string outfile, string errprefix, string command)
+##! @brief Executes a command in a specified directory, saving output to a file
+##! @param directory Working directory in which to execute command; directory must exist and be writable
+##! @param outfile File path to capture command stdout and stderr
+##! @param errprefix String prepended to output on command failure
+##! @param command Command line to execute
+##! @return Zero if successful, displays command output and calls `bootstrap_die` otherwise
 function bootstrap_build_exec()
 {
 	local directory="$1"
@@ -29,9 +36,12 @@ function bootstrap_build_exec()
 	fi
 }
 
-# bootstrap_build_make(directory, outfile[, makeargs])
-# Executes "make" in a specified directory, saving output to outfile
-# If make fails, output will be displayed and boostrap_die is called
+##! @fn bootstrap_build_make(string directory, string outfile, string makeargs)
+##! @brief Executes `make` in a specified directory, saving output to a file
+##! @param directory Working directory in which to execute command; directory must exist and be writable
+##! @param outfile File path to capture command stdout and stderr
+##! @param makeargs (optional) Command line arguments
+##! @return Zero if successful, displays `make` output and calls `bootstrap_die` otherwise
 function bootstrap_build_make()
 {
 	local directory="$1"
@@ -43,9 +53,12 @@ function bootstrap_build_make()
 	bootstrap_build_exec $directory $outfile "make" "$cmd"
 }
 
-# bootstrap_build_configure(directory, outfile[, cmdargs])
-# Executes "configure" in a specified directory, saving output to outfile
-# If configure fails, output will be displayed and boostrap_die is called
+##! @fn bootstrap_build_configure(string directory, string outfile, string cmdargs)
+##! @brief Executes `configure` in a specified directory, saving output to a file
+##! @param directory Working directory in which to execute command; directory must exist and be writable
+##! @param outfile File path to capture command stdout and stderr
+##! @param cmdargs (optional) Command line arguments
+##! @return Zero if successful, displays `configure` output and calls `bootstrap_die` otherwise
 function bootstrap_build_configure()
 {
     local directory="$1"

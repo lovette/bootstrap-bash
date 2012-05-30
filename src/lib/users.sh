@@ -6,24 +6,33 @@
 # See the file LICENSE.txt for the full license text.
 #
 # Available from https://github.com/lovette/bootstrap-bash
+#
+##! @file
+##! @brief Convenience functions to manage users and groups
 
-# bootstrap_user_exists(name)
-# Returns nonzero if user name exists
+##! @fn bootstrap_user_exists(string name)
+##! @brief Check if user name exists.
+##! @param name User name
+##! @return Zero if user exists, non-zero otherwise
 function bootstrap_user_exists()
 {
 	/usr/bin/id "$1" &>/dev/null
 }
 
-# bootstrap_user_group_exists(name)
-# Returns nonzero if the group name exists
+##! @fn bootstrap_user_group_exists(string name)
+##! @brief Check if group name exists.
+##! @param name Group name
+##! @return Zero if group exists, non-zero otherwise
 function bootstrap_user_group_exists()
 {
 	/usr/bin/id -g "$1" &>/dev/null
 }
 
-# bootstrap_user_group_add(uid, name)
-# Add a user group
-# Exits if the group cannot be added
+##! @fn bootstrap_user_group_add(int uid, string name)
+##! @brief Add a user group.
+##! @param uid Numerical group identifier
+##! @param name Group name
+##! @return Zero if group is added or already exists, calls `bootstrap_die` otherwise
 function bootstrap_user_group_add()
 {
 	local ADDGID=$1
@@ -35,9 +44,14 @@ function bootstrap_user_group_add()
 	fi
 }
 
-# bootstrap_user_add_system(uid, name, comment, home)
-# Add an account for a daemon which has no login rights
-# Exits if the user cannot be added
+##! @fn bootstrap_user_add_system(int uid, string name, string comment, string home)
+##! @brief Add a user account for a daemon which has no login rights.
+##! @note Adds a user group with same uid and name if necessary.
+##! @param uid Numerical user identifier
+##! @param name User name
+##! @param comment Short description of daemon
+##! @param home User login directory, will not be created if it is missing.
+##! @return Zero if user is added or already exists, calls `bootstrap_die` otherwise
 function bootstrap_user_add_system()
 {
 	local ADDUID="$1"
@@ -53,10 +67,15 @@ function bootstrap_user_add_system()
 	fi
 }
 
-# bootstrap_user_add_login(uid, name, comment, password)
-# Add an account for a person who has login rights
-# Exits if the user cannot be added
-# Requires Perl be installed so password can be encrypted
+##! @fn bootstrap_user_add_login(int uid, string name, string comment, string password)
+##! @brief Add a user account for a person who has login rights.
+##! @note Adds a user group with same uid and name if necessary.
+##! @attention Requires Perl be installed so password can be encrypted.
+##! @param uid Numerical user identifier
+##! @param name User name
+##! @param comment User's full name
+##! @param password Plain text password
+##! @return Zero if user is added or already exists, calls `bootstrap_die` otherwise
 function bootstrap_user_add_login()
 {
 	local ADDUID="$1"

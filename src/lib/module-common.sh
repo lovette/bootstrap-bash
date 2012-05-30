@@ -7,9 +7,18 @@
 # See the file LICENSE.txt for the full license text.
 #
 # Available from https://github.com/lovette/bootstrap-bash
+#
+##! @file
+##! @brief General module convenience functions
+##! @note It is recommended (but not required) that all module scripts include
+##!   this at the beginning of the script.
+##! @note This script sets the shell option `nullglob` so glob patterns which
+##!   match no files expand to a null string.
 
-# bootstrap_die(message)
-# Prints optional message and exits with an error code
+##! @fn bootstrap_die(string message)
+##! @details The bootstrap process will stop execution after this function exits
+##! @brief Prints error message and exits with error status 1
+##! @param message (optional) Error message
 function bootstrap_die()
 {
 	local message="$1"
