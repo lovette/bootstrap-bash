@@ -37,7 +37,7 @@ uninstall:
 	-rm -f $(DESTDIR)/$(MANDIR)/bootstrap-bash.8.gz
 
 help2man:
-	help2man -n "simple server bootstrap and configuration framework based on BASH scripts" -s 8 -N -o docs/bootstrap-bash.8 "bash src/bootstrap-bash.sh"
+	help2man -n "simple server kickstart and software configuration tool" -s 8 -N -o docs/bootstrap-bash.8 "bash src/bootstrap-bash.sh"
 
 doxygen:
 	-rm -rf docs/html
