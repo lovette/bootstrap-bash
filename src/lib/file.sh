@@ -431,7 +431,7 @@ function bootstrap_dir_copy()
 		"1")
 			docopy=1 ;;
 		"2")
-			[ -d "$destpath" ] && /bin/rm -rf "$destpath"
+			[ -d "$destpath" ] && bootstrap_dir_rmdir "$destpath"
 			docopy=1 ;;
 		 * )
 			bootstrap_die "bootstrap_dir_copy: bad arg"
@@ -453,3 +453,24 @@ function bootstrap_dir_copy()
 		echo " * $destpath/ not copied ($skipreason)"
 	fi
 }
+
+##! @fn bootstrap_dir_rmdir(string path)
+##! @brief Remove directory and all its contents
+##! @param path Directory path
+##! @note No-op if `path` does not exist
+##! @return Zero if successful, calls `bootstrap_die` otherwise
+##! @warning Be careful when using this function.
+function bootstrap_dir_rmdir()
+{
+	local dirpath=$1
+
+	# This function can really screw you, but we can at least prevent "rm -rf /"
+	[ "$dirpath" == "/" ] && bootstrap_die "bootstrap_dir_rmdir: destpath cannot be /"
+
+	if [ -d "$dirpath" ]; then
+		/bin/rm -rf "$dirpath"
+		[ $? -ne 0 ] && bootstrap_die
+		echo " * removed $dirpath/"
+	fi
+}
+
