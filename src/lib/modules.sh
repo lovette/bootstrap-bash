@@ -91,14 +91,16 @@ function bootstrap_modules_get_version_info()
 {
 	local module=$1
 	local verfilepath="${BOOTSTRAP_DIR_MODULES}/${module}/version.txt"
+	local REGEX_DESC="^[D|d]escription: *(.+)$"
+	local REGEX_VER="^[V|v]ersion: *(.+)$"
 
 	module_version_desc="-"
 	module_version_ver="-"
 
 	if [ -f "$verfilepath" ] && [ -r "$verfilepath" ]; then
 		while read curline; do
-			[[ "$curline" =~ "^[D|d]escription: *(.+)$" ]] && module_version_desc="${BASH_REMATCH[1]}"
-			[[ "$curline" =~ "^[V|v]ersion: *(.+)$" ]] && module_version_ver="${BASH_REMATCH[1]}"
+			[[ "$curline" =~ $REGEX_DESC ]] && module_version_desc="${BASH_REMATCH[1]}"
+			[[ "$curline" =~ $REGEX_VER ]] && module_version_ver="${BASH_REMATCH[1]}"
 		done < "$verfilepath"
 	fi
 }
