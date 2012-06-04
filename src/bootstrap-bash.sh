@@ -264,7 +264,11 @@ fi
 bootstrap_modules_scan "${BOOTSTRAP_MODULE_NAMES[@]}"
 
 if [ $BOOTSTRAP_GETOPT_PRINTMODULES -eq 1 ]; then
-	echo ${BOOTSTRAP_MODULE_NAMES[@]}
+	for module in "${BOOTSTRAP_MODULE_NAMES[@]}";
+	do
+		echo "$module"
+	done
+
 	exit 0
 fi
 
