@@ -14,7 +14,7 @@ function bootstrap_die()
 {
 	local message="$1"
 
-	[ -n "$message" ] && echo $message
+	[ -n "$message" ] && echo "$message"
 	echo "Aborting bootstrap install!"
 	exit 1
 }
