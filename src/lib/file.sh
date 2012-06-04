@@ -107,11 +107,12 @@ function bootstrap_file_wget()
 	fi
 }
 
-##! @fn bootstrap_file_untar(string path, string targetdir, string owner)
+##! @fn bootstrap_file_untar(string path, string targetdir, string owner, int overwrite)
 ##! @brief Extract compressed "tarfile" archive into a directory.
 ##! @param path Archive file path
 ##! @param targetdir Directory in which to extract archive files
 ##! @param owner New directory and file ownership; set to empty string for default
+##! @param overwrite (optional) Overwrite mode: 0=never, 1=rmdir before extraction
 ##! @note The first path component of the paths in the archive will be stripped
 ##! @note No-op if `targetdir` already exists
 ##! @note Target directory will be created with permissions 755
@@ -121,6 +122,11 @@ function bootstrap_file_untar()
 	local tarfile=$1
 	local targetdir=$2
 	local fileowner=$3
+	local overwrite=0
+
+	[ $# -ge 4 ] && overwrite=$4
+
+	[ $overwrite -eq 0 ] || bootstrap_dir_rmdir "$targetdir"
 
 	if [ ! -d "$targetdir" ]; then
 		bootstrap_mkdir "$targetdir" 755
