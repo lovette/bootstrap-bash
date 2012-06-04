@@ -173,6 +173,7 @@ function bootstrap_modules_script_exec()
 	export BOOTSTRAP_ROLE
 	export BOOTSTRAP_BASEARCH
 	export BOOTSTRAP_PROCARCH
+	export BOOTSTRAP_INSTALL_FORCED
 	export BOOTSTRAP_DIR_LIB
 	export BOOTSTRAP_DIR_ROLE
 	export BOOTSTRAP_DIR_MODULE
@@ -257,8 +258,17 @@ function bootstrap_modules_install()
 			bootstrap_echo_header "Installing ${module} module..."
 
 			if ! bootstrap_modules_check_state "$module" "install-sh"; then
+				# We don't know if:
+				#  1) This is the first run of install.sh
+				#  2) The module state directory was deleted
+				#  3) Installation is being forced with -f option
+				# In these cases, tell install script it can/should install from a clean slate:
+				BOOTSTRAP_INSTALL_FORCED=1
+
 				bootstrap_modules_script_exec "$module" "$installscript"
 				bootstrap_modules_set_state "$module" "install-sh"
+
+				BOOTSTRAP_INSTALL_FORCED=0
 			else
 				echo " ! Module previously installed (use -f to force install)"
 			fi

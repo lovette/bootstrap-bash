@@ -158,6 +158,7 @@ and `config.sh` scripts:
 * `BOOTSTRAP_ROLE` - The active role being installed
 * `BOOTSTRAP_BASEARCH` - The server hardware (base) architecture (e.g. i386, x86_64)
 * `BOOTSTRAP_PROCARCH` - The server processor architecture (e.g. i686, x86_64)
+* `BOOTSTRAP_INSTALL_FORCED` - The install is being run for the first time or with the `-f` option
 * `BOOTSTRAP_DIR_LIB` - The directory with bootstrap library scripts
 * `BOOTSTRAP_DIR_ROLE` - The active roles directory
 * `BOOTSTRAP_DIR_MODULE` - The directory containing the active module install script
