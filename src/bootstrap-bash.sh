@@ -92,11 +92,11 @@ function usage()
 # Confirm with the user the modules that will be installed or updated
 function confirm()
 {
-	TERMWIDTH=$(tput cols)
-	COLSPEC="%-20.20s %-15.15s %s\n"
-	INSTALLMODULES=( )
-	REINSTALLMODULES=( )
-	REFRESHMODULES=( )
+	local TERMWIDTH=$(tput cols)
+	local COLSPEC="%-20.20s %-15.15s %s\n"
+	local INSTALLMODULES=( )
+	local REINSTALLMODULES=( )
+	local REFRESHMODULES=( )
 
 	# Build lists of module states
 	for module in "${BOOTSTRAP_MODULE_NAMES[@]}";
