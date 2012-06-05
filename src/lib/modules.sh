@@ -107,7 +107,7 @@ function bootstrap_modules_get_version_info()
 
 # bootstrap_modules_build_list()
 # Build list of modules based on the active role
-# Return value is the global array BOOTSTRAP_MODULE_NAMES
+# Return value is the global array BOOTSTRAP_ROLE_MODULE_NAMES
 function bootstrap_modules_build_list()
 {
 	local file=""
@@ -116,7 +116,7 @@ function bootstrap_modules_build_list()
 	local pathparts=( )
 	local rolepath=""
 
-	BOOTSTRAP_MODULE_NAMES=( )
+	BOOTSTRAP_ROLE_MODULE_NAMES=( )
 
 	modulefiles[${#modulefiles[@]}]="${BOOTSTRAP_DIR_ROLES}/modules.txt"
 
@@ -134,7 +134,7 @@ function bootstrap_modules_build_list()
 	do
 		if [ -f "$file" ]; then
 			bootstrap_file_get_contents_list $file
-			BOOTSTRAP_MODULE_NAMES=( ${BOOTSTRAP_MODULE_NAMES[@]} $get_file_contents_return )
+			BOOTSTRAP_ROLE_MODULE_NAMES=( ${BOOTSTRAP_ROLE_MODULE_NAMES[@]} $get_file_contents_return )
 		fi
 	done
 }

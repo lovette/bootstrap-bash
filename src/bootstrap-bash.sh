@@ -76,7 +76,7 @@ function usage()
 	echo "  -f             Force run module install scripts, even if they have run before"
 	echo "  -h, --help     Show this help and exit"
 	echo "  -l             List modules that would be installed"
-	echo "  -m MODULE      Install only this module (specify -m for each module)"
+	echo "  -m MODULE      Install only this module (specify -m for each module); can be a glob pattern"
 	echo "  -p             Package management only, skip install scripts"
 	echo "  -s             Debug: output module install script commands, check syntax (implies -d)"
 	echo "  -V, --version  Print version and exit"
@@ -157,6 +157,56 @@ function confirm()
 	esac
 
 	echo
+}
+
+# Set BOOTSTRAP_MODULE_NAMES to list of modules to install/config
+function init_module_names()
+{
+	local selectedmodules=( )
+	local validmodule=0
+	local modulespec=""
+	local rolemodule=""
+	local module=""
+
+	BOOTSTRAP_MODULE_NAMES=( )
+
+	# Enumerate all modules selected for the role
+	bootstrap_modules_build_list
+
+	if [ "${#BOOTSTRAP_GETOPT_MODULE_NAMES[@]}" -gt 0 ]; then
+		# Confirm specified modules are selected for this role while also expanding glob patterns
+		for modulespec in "${BOOTSTRAP_GETOPT_MODULE_NAMES[@]}";
+		do
+			validmodule=0
+
+			for rolemodule in "${BOOTSTRAP_ROLE_MODULE_NAMES[@]}";
+			do
+				if [[ $rolemodule == $modulespec ]]; then
+					validmodule=1
+					selectedmodules=( "${selectedmodules[@]}" $rolemodule )
+				fi
+			done
+
+			[ $validmodule -gt 0 ] || bootstrap_die "$modulespec: not found in list of role modules"
+		done
+
+		# Install modules in consistent order
+		for rolemodule in "${BOOTSTRAP_ROLE_MODULE_NAMES[@]}";
+		do
+			for module in "${selectedmodules[@]}";
+			do
+				if [ "$rolemodule" == "$module" ]; then
+					BOOTSTRAP_MODULE_NAMES=( "${BOOTSTRAP_MODULE_NAMES[@]}" $module )
+				fi
+			done
+		done
+	else
+		# Install all modules selected for this role
+		BOOTSTRAP_MODULE_NAMES=( ${BOOTSTRAP_ROLE_MODULE_NAMES[@]} )
+	fi
+
+	# Remove duplicate modules
+	BOOTSTRAP_MODULE_NAMES=( $( printf "%s\n" "${BOOTSTRAP_MODULE_NAMES[@]}" | awk '!x[$0]++' ) )
 }
 
 function onexit()
@@ -255,12 +305,9 @@ BOOTSTRAP_DIR_ROLE="${BOOTSTRAP_DIR_ROLES}/${BOOTSTRAP_ROLE}"
 [ -d "$BOOTSTRAP_DIR_ROLES" ] || bootstrap_die "The directory specified by BOOTSTRAP_DIR_ROLES does not exist ($BOOTSTRAP_DIR_ROLES)"
 [ -d "$BOOTSTRAP_DIR_ROLE" ] || bootstrap_die "${BOOTSTRAP_ROLE}: Not a valid role"
 
-# Build list of modules based on role if none were explicitly set
-if [ "${#BOOTSTRAP_GETOPT_MODULE_NAMES[@]}" -eq 0 ]; then
-	bootstrap_modules_build_list
-else
-	BOOTSTRAP_MODULE_NAMES=( "${BOOTSTRAP_GETOPT_MODULE_NAMES[@]}" )
-fi
+init_module_names
+
+[ "${#BOOTSTRAP_MODULE_NAMES[@]}" -gt 0 ] || bootstrap_die "No modules selected"
 
 bootstrap_modules_scan "${BOOTSTRAP_MODULE_NAMES[@]}"
 
