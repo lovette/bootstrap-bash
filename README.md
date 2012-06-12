@@ -193,6 +193,7 @@ Each role directory contains a text file that defines the role modules.
 
 Text file listing names of modules that will be applied for the role.
 Blank lines and comment lines beginning with "#" will be ignored.
+Optional modules can be specified by wrapping with parenthesis.
 The `modules.txt` file in each directory above a subrole will be applied when
 a role is selected. This allows for common modules to be defined in common role directories.
 

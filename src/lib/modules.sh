@@ -107,7 +107,10 @@ function bootstrap_modules_get_version_info()
 
 # bootstrap_modules_build_list()
 # Build list of modules based on the active role
-# Return value is the global array BOOTSTRAP_ROLE_MODULE_NAMES
+# Return value is these global arrays:
+#   BOOTSTRAP_ROLE_ALL_MODULES - all modules
+#   BOOTSTRAP_ROLE_DEFAULT_MODULES - default modules
+#   BOOTSTRAP_ROLE_OPTIONAL_MODULES - optional modules
 function bootstrap_modules_build_list()
 {
 	local file=""
@@ -115,8 +118,11 @@ function bootstrap_modules_build_list()
 	local pathpart=""
 	local pathparts=( )
 	local rolepath=""
+	local REGEX_OPTIONAL_MODULE="\((.+)\)"
 
-	BOOTSTRAP_ROLE_MODULE_NAMES=( )
+	BOOTSTRAP_ROLE_ALL_MODULES=( )
+	BOOTSTRAP_ROLE_DEFAULT_MODULES=( )
+	BOOTSTRAP_ROLE_OPTIONAL_MODULES=( )
 
 	modulefiles[${#modulefiles[@]}]="${BOOTSTRAP_DIR_ROLES}/modules.txt"
 
@@ -134,7 +140,16 @@ function bootstrap_modules_build_list()
 	do
 		if [ -f "$file" ]; then
 			bootstrap_file_get_contents_list $file
-			BOOTSTRAP_ROLE_MODULE_NAMES=( ${BOOTSTRAP_ROLE_MODULE_NAMES[@]} $get_file_contents_return )
+			for module in $get_file_contents_return; do
+				if [[ $module =~ $REGEX_OPTIONAL_MODULE ]]; then
+					# Modules in parenthesis are optional
+					BOOTSTRAP_ROLE_ALL_MODULES=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} ${BASH_REMATCH[1]} )
+					BOOTSTRAP_ROLE_OPTIONAL_MODULES=( ${BOOTSTRAP_ROLE_OPTIONAL_MODULES[@]} ${BASH_REMATCH[1]} )
+				else
+					BOOTSTRAP_ROLE_ALL_MODULES=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} $module )
+					BOOTSTRAP_ROLE_DEFAULT_MODULES=( ${BOOTSTRAP_ROLE_DEFAULT_MODULES[@]} $module )
+				fi
+			done
 		fi
 	done
 }

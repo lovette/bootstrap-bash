@@ -33,6 +33,7 @@ BOOTSTRAP_GETOPT_MODULE_NAMES=( )
 BOOTSTRAP_GETOPT_PROMPT=1
 BOOTSTRAP_GETOPT_PACKAGESONLY=0
 BOOTSTRAP_GETOPT_CONFIGONLY=0
+BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES=0
 
 # You can find a list of color values at
 # https://wiki.archlinux.org/index.php/Color_Bash_Prompt
@@ -77,6 +78,7 @@ function usage()
 	echo "  -h, --help     Show this help and exit"
 	echo "  -l             List modules that would be installed"
 	echo "  -m MODULE      Install only this module (specify -m for each module); can be a glob pattern"
+	echo "  -O             Include optional modules"
 	echo "  -p             Package management only, skip install scripts"
 	echo "  -s             Debug: output module install script commands, check syntax (implies -d)"
 	echo "  -V, --version  Print version and exit"
@@ -167,11 +169,19 @@ function init_module_names()
 	local modulespec=""
 	local rolemodule=""
 	local module=""
+	local activemodules=( )
 
 	BOOTSTRAP_MODULE_NAMES=( )
 
 	# Enumerate all modules selected for the role
 	bootstrap_modules_build_list
+
+	# Activate all modules or only default modules?
+	if [ $BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES -eq 1 ]; then
+		activemodules=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} )
+	else
+		activemodules=( ${BOOTSTRAP_ROLE_DEFAULT_MODULES[@]} )
+	fi
 
 	if [ "${#BOOTSTRAP_GETOPT_MODULE_NAMES[@]}" -gt 0 ]; then
 		# Confirm specified modules are selected for this role while also expanding glob patterns
@@ -179,7 +189,7 @@ function init_module_names()
 		do
 			validmodule=0
 
-			for rolemodule in "${BOOTSTRAP_ROLE_MODULE_NAMES[@]}";
+			for rolemodule in "${activemodules[@]}";
 			do
 				if [[ $rolemodule == $modulespec ]]; then
 					validmodule=1
@@ -191,7 +201,7 @@ function init_module_names()
 		done
 
 		# Install modules in consistent order
-		for rolemodule in "${BOOTSTRAP_ROLE_MODULE_NAMES[@]}";
+		for rolemodule in "${activemodules[@]}";
 		do
 			for module in "${selectedmodules[@]}";
 			do
@@ -202,7 +212,7 @@ function init_module_names()
 		done
 	else
 		# Install all modules selected for this role
-		BOOTSTRAP_MODULE_NAMES=( ${BOOTSTRAP_ROLE_MODULE_NAMES[@]} )
+		BOOTSTRAP_MODULE_NAMES=( ${activemodules[@]} )
 	fi
 
 	# Remove duplicate modules
@@ -238,7 +248,7 @@ source ${BOOTSTRAP_DIR_LIB}/yum.sh
 source ${BOOTSTRAP_DIR_LIB}/rpm.sh
 
 # Parse command line options
-while getopts "c:dfhlm:psVuxy" opt
+while getopts "c:dfhlm:OpsVuxy" opt
 do
 	case $opt in
 	c  ) BOOTSTRAP_GETOPT_CONFIG=$OPTARG;;
@@ -247,6 +257,7 @@ do
 	h  ) usage;;
 	l  ) BOOTSTRAP_GETOPT_PRINTMODULES=1;;
 	m  ) BOOTSTRAP_GETOPT_MODULE_NAMES[${#BOOTSTRAP_GETOPT_MODULE_NAMES[@]}]=$OPTARG;;
+	O  ) BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES=1;;
 	p  ) BOOTSTRAP_GETOPT_PACKAGESONLY=1; BOOTSTRAP_GETOPT_FORCE=0;;
 	s  ) BOOTSTRAP_GETOPT_DRYRUN=1; BOOTSTRAP_GETOPT_PRINTSCRIPTS=1;;
 	u  ) BOOTSTRAP_GETOPT_CONFIGONLY=1; BOOTSTRAP_GETOPT_FORCE=0;;
