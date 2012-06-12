@@ -110,6 +110,7 @@ configuration and package management for the module.
 
 	modules/
 	|- <module name>/
+	|...
 
 ### Files
 Each module directory contains one or more shell scripts or text files that
@@ -180,6 +181,7 @@ Each available role must be a subdirectory below a root roles directory.
 	roles/
 	|- <role>/
 	   |-- <subrole>/
+	   |...
 
 Each role directory can have subdirectories that define a "subrole".
 For example, you could define the top-level roles "development" and "public".
