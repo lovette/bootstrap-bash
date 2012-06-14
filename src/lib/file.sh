@@ -199,6 +199,8 @@ function bootstrap_file_copy()
 	local overwrite=$5
 	local docopy=0
 	local skipreason=""
+	local srcbasename=$(basename "$srcpath")
+	local destbasename=$(basename "$destpath")
 
 	[ -f "$srcpath" ] || bootstrap_die "cannot copy file: $srcpath does not exist"
 
@@ -227,7 +229,11 @@ function bootstrap_file_copy()
 		[ -n "$BOOTSTRAP_DIR_MODULE" ] && srcpath="${srcpath/#$BOOTSTRAP_DIR_MODULE/[module] }"
 		[ -n "$BOOTSTRAP_DIR_ROLE" ] && srcpath="${srcpath/#$BOOTSTRAP_DIR_ROLE/[role] }"
 
-		echo " * copied ${srcpath} to $destpath"
+		if [ "$srcbasename" == "$destbasename" ]; then
+			echo " * copied ${srcpath} to ${destpath/%$srcbasename/}"
+		else
+			echo " * copied ${srcpath} as ${destpath}"
+		fi
 	else
 		echo " * $destpath not copied ($skipreason)"
 	fi
@@ -420,6 +426,8 @@ function bootstrap_dir_copy()
 	local overwrite=$6
 	local docopy=0
 	local skipreason=""
+	local srcbasename=$(basename "$srcpath")
+	local destbasename=$(basename "$destpath")
 
 	[ -d "$srcpath" ] || bootstrap_die "cannot copy: $srcpath not a directory"
 
@@ -454,7 +462,11 @@ function bootstrap_dir_copy()
 		[ -n "$BOOTSTRAP_DIR_MODULE" ] && srcpath="${srcpath/#$BOOTSTRAP_DIR_MODULE/[module] }"
 		[ -n "$BOOTSTRAP_DIR_ROLE" ] && srcpath="${srcpath/#$BOOTSTRAP_DIR_ROLE/[role] }"
 
-		echo " * copied ${srcpath}/ to $destpath/"
+		if [ "$srcbasename" == "$destbasename" ]; then
+			echo " * copied ${srcpath}/ to ${destpath/%$srcbasename/}"
+		else
+			echo " * copied ${srcpath}/ as ${destpath}/"
+		fi
 	else
 		echo " * $destpath/ not copied ($skipreason)"
 	fi
