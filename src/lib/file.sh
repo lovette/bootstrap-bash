@@ -185,7 +185,7 @@ function bootstrap_file_move()
 ##! @param destpath Destination file path
 ##! @param owner New file ownership; set to empty string to preserve
 ##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
-##! @param overwrite Overwrite mode: 0=never, 1=always, 2=if file size has changed
+##! @param overwrite Overwrite mode: 0=never, 1=always, 2=if newer or file size has changed
 ##! @note No-op if `destpath` exists unless `overwrite` is non-zero
 ##! @note Timestamps are preserved
 ##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
@@ -446,7 +446,7 @@ function bootstrap_dir_copy()
 	if [ $docopy -eq 1 ]; then
 		/bin/cp -r --preserve=timestamps "$srcpath" "$destpath"
 		[ $? -ne 0 ] && bootstrap_die
-		
+
 		bootstrap_dir_chown "$destpath" "$fileowner"
 		bootstrap_dir_chmod "$destpath" $dirperms $fileperms
 
