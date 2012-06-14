@@ -352,6 +352,8 @@ elif [ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ]; then
 	echo "Package management only, skipping install scripts"
 fi
 
+[ $BOOTSTRAP_GETOPT_DRYRUN -eq 1 ] && echo "Debug mode: showing commands that would be executed (pseudo dry run)"
+
 # Confirm with the user if necessary
 [ $BOOTSTRAP_GETOPT_PROMPT -eq 1 ] && confirm
 
