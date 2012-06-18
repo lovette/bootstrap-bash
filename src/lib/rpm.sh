@@ -22,6 +22,7 @@ function bootstrap_rpm_packages_install()
 	local installrpms=( )
 	local dlrpms=( )
 	local forced=0
+	local REMOTEPATHREGEX="^(http|ftp)://"
 
 	[ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ] && forced=1
 
@@ -39,7 +40,7 @@ function bootstrap_rpm_packages_install()
 					for rpmpath in $rpms;
 					do
 						# rpmpath can be a URL or full/relative local file path
-						if [[ "$rpmpath" =~ "^(http|ftp)://" ]]; then
+						if [[ "$rpmpath" =~ $REMOTEPATHREGEX ]]; then
 							rpmname=$(basename "$rpmpath")
 							localpath="$BOOTSTRAP_DIR_CACHE_RPM/$rpmname"
 							[ ! -f "$localpath" ] && dlrpms=( "${dlrpms[@]}" $rpmpath )
