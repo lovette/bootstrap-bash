@@ -198,6 +198,7 @@ Text file listing names of modules that will be applied for the role.
 	module|(module) [order]
 
 Blank lines and comment lines beginning with "#" will be ignored.
+
 Optional modules can be specified by enclosing the name within parenthesis.
 
 The `modules.txt` file in each directory above a subrole will be applied when
@@ -256,12 +257,18 @@ or the processor architecture (e.g. i686, x86_64) with {BOOTSTRAP_PROCARCH}.
 
 `rpm-packages.txt` lists all packages that should be installed with `rpm` directly.
 
+	PATH|URL [nodeps]
+
 Each line should contain the URL (HTTP or FTP) or local file path to a .rpm file.
 (If the path is relative, it will be prepended with the module directory.)
-Blank lines and comment lines beginning with "#" will be ignored.
-
 Non-local RPMs will be downloaded with `wget` and saved to the directory
 specified by BOOTSTRAP_DIR_CACHE_RPM.
+
+Blank lines and comment lines beginning with "#" will be ignored.
+
+The file path or URL can be followed by the option "nodeps" to force the
+install without checking dependencies. These RPMs will be installed before
+other RPMs.
 
 ### Other package management tools
 
