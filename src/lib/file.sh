@@ -297,6 +297,7 @@ function bootstrap_file_link()
 	local linkdir=$(dirname $linkpath)
 	local linkname=$(basename $linkpath)
 
+	[ -d "$linkdir" ] || bootstrap_die "cannot link to target: directory $linkdir does not exist"
 	[ -e "$target" ] || bootstrap_die "cannot link to target: $target does not exist"
 
 	(cd "$linkdir" && /bin/ln -sf "$target" "$linkname")
