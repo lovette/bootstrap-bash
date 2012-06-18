@@ -76,7 +76,7 @@ function usage()
 	echo "  -d             Debug: show commands that would be executed (pseudo dry run)"
 	echo "  -f             Force run module install scripts, even if they have run before"
 	echo "  -h, --help     Show this help and exit"
-	echo "  -l             List modules that would be installed"
+	echo "  -l             List modules that would be installed; specify more than once to include details"
 	echo "  -m MODULE      Install only this module (specify -m for each module); can be a glob pattern"
 	echo "  -O             Include optional modules"
 	echo "  -p             Package management only, skip install scripts"
@@ -255,7 +255,7 @@ do
 	d  ) BOOTSTRAP_GETOPT_DRYRUN=1;;
 	f  ) BOOTSTRAP_GETOPT_FORCE=1;;
 	h  ) usage;;
-	l  ) BOOTSTRAP_GETOPT_PRINTMODULES=1;;
+	l  ) let BOOTSTRAP_GETOPT_PRINTMODULES++;;
 	m  ) BOOTSTRAP_GETOPT_MODULE_NAMES[${#BOOTSTRAP_GETOPT_MODULE_NAMES[@]}]=$OPTARG;;
 	O  ) BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES=1;;
 	p  ) BOOTSTRAP_GETOPT_PACKAGESONLY=1; BOOTSTRAP_GETOPT_FORCE=0;;
@@ -322,10 +322,14 @@ init_module_names
 
 bootstrap_modules_scan "${BOOTSTRAP_MODULE_NAMES[@]}"
 
-if [ $BOOTSTRAP_GETOPT_PRINTMODULES -eq 1 ]; then
+if [ $BOOTSTRAP_GETOPT_PRINTMODULES -gt 0 ]; then
 	for module in "${BOOTSTRAP_MODULE_NAMES[@]}";
 	do
-		echo "$module"
+		if [ $BOOTSTRAP_GETOPT_PRINTMODULES -gt 1  ]; then
+			echo $(bootstrap_modules_getorder "$module") "$module"
+		else
+			echo "$module"
+		fi
 	done
 
 	exit 0

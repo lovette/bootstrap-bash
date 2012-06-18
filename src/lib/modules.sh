@@ -7,6 +7,8 @@
 #
 # Available from https://github.com/lovette/bootstrap-bash
 
+BOOTSTRAP_MODULES_MODULELISTPATH="$BOOTSTRAP_DIR_CACHE/modulelist"
+
 # bootstrap_modules_set_state(module name, action)
 # Creates module state file for an action
 function bootstrap_modules_set_state()
@@ -119,37 +121,72 @@ function bootstrap_modules_build_list()
 	local pathparts=( )
 	local rolepath=""
 	local REGEX_OPTIONAL_MODULE="\((.+)\)"
+	local filepath=""
+	local modules=""
 
 	BOOTSTRAP_ROLE_ALL_MODULES=( )
 	BOOTSTRAP_ROLE_DEFAULT_MODULES=( )
 	BOOTSTRAP_ROLE_OPTIONAL_MODULES=( )
 
-	modulefiles[${#modulefiles[@]}]="${BOOTSTRAP_DIR_ROLES}/modules.txt"
+	filepath="${BOOTSTRAP_DIR_ROLES}/modules.txt"
+	[ -f "$filepath" ] && modulefiles[${#modulefiles[@]}]="$filepath"
 
 	# Split the role path into directory parts and reference
 	# modules.txt for each directory in the path
 	rolepath="$BOOTSTRAP_DIR_ROLES"
 	IFS='/' read -ra pathparts <<< "${BOOTSTRAP_DIR_ROLE##$rolepath/}"
 	for pathpart in "${pathparts[@]}"; do
-		modulefiles[${#modulefiles[@]}]="${rolepath}/${pathpart}/modules.txt"
+		filepath="${rolepath}/${pathpart}/modules.txt"
+		[ -f "$filepath" ] && modulefiles[${#modulefiles[@]}]="$filepath"
 		rolepath="${rolepath}/${pathpart}"
 	done
 
+	# Sort modules by order
+	(awk '
+		BEGIN {
+			order=0;
+			filenum=1;
+			curfile="";
+		}
+
+		{
+			# Each file gets a new range base
+			if (curfile != FILENAME)
+				order = filenum++ * 200;
+			curfile=FILENAME;
+
+			# Skip blank lines and comments
+			if ($1 == "")
+				next;
+			if (substr($1, 1, 1) == "#")
+				next;
+
+			# If an order is not set explicitly, assign a default
+			if ($2 == "")
+			{
+				printf("%06d\t", order);
+				order += 5
+			}
+			else
+			{
+				printf("%06d\t", $2);
+			}
+
+			print $1;
+		}
+	' "${modulefiles[@]}" | sort) > "$BOOTSTRAP_MODULES_MODULELISTPATH"
+
+	modules=$(cut -f2 "$BOOTSTRAP_MODULES_MODULELISTPATH")
+
 	# Build list of modules based on role
-	for file in "${modulefiles[@]}"
-	do
-		if [ -f "$file" ]; then
-			bootstrap_file_get_contents_list $file
-			for module in $get_file_contents_return; do
-				if [[ $module =~ $REGEX_OPTIONAL_MODULE ]]; then
-					# Modules in parenthesis are optional
-					BOOTSTRAP_ROLE_ALL_MODULES=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} ${BASH_REMATCH[1]} )
-					BOOTSTRAP_ROLE_OPTIONAL_MODULES=( ${BOOTSTRAP_ROLE_OPTIONAL_MODULES[@]} ${BASH_REMATCH[1]} )
-				else
-					BOOTSTRAP_ROLE_ALL_MODULES=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} $module )
-					BOOTSTRAP_ROLE_DEFAULT_MODULES=( ${BOOTSTRAP_ROLE_DEFAULT_MODULES[@]} $module )
-				fi
-			done
+	for module in $modules; do
+		if [[ $module =~ $REGEX_OPTIONAL_MODULE ]]; then
+			# Modules in parenthesis are optional
+			BOOTSTRAP_ROLE_ALL_MODULES=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} ${BASH_REMATCH[1]} )
+			BOOTSTRAP_ROLE_OPTIONAL_MODULES=( ${BOOTSTRAP_ROLE_OPTIONAL_MODULES[@]} ${BASH_REMATCH[1]} )
+		else
+			BOOTSTRAP_ROLE_ALL_MODULES=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} $module )
+			BOOTSTRAP_ROLE_DEFAULT_MODULES=( ${BOOTSTRAP_ROLE_DEFAULT_MODULES[@]} $module )
 		fi
 	done
 }
@@ -301,4 +338,17 @@ function bootstrap_modules_install()
 			fi
 		fi
 	done
+}
+
+# bootstrap_modules_getorder(name)
+# Echos the installation order of the specified module.
+# bootstrap_modules_build_list must be called first
+function bootstrap_modules_getorder()
+{
+	local module="$1"
+
+	[ -n "$module" ] || return 1
+	[ -f "$BOOTSTRAP_MODULES_MODULELISTPATH" ] || return 1
+
+	awk -v module="$module" '($2 == module) {print $1}' "$BOOTSTRAP_MODULES_MODULELISTPATH"
 }

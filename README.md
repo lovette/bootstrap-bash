@@ -194,11 +194,19 @@ Each role directory contains a text file that defines the role modules.
 #### modules.txt
 
 Text file listing names of modules that will be applied for the role.
+
+	module|(module) [order]
+
 Blank lines and comment lines beginning with "#" will be ignored.
-Optional modules can be specified by wrapping with parenthesis.
+Optional modules can be specified by enclosing the name within parenthesis.
+
 The `modules.txt` file in each directory above a subrole will be applied when
 a role is selected. This allows for common modules to be defined in common role directories.
 
+The installation order of modules can be controlled by assigning the module
+a numerical order. Modules will be installed in order. The default order is
+based on the order they are listed in modules.txt. Explicitly defining an order
+allows subroles to install modules before or after inherited modules.
 
 Package Management
 ---
