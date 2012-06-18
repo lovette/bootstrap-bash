@@ -316,6 +316,18 @@ BOOTSTRAP_DIR_ROLE="${BOOTSTRAP_DIR_ROLES}/${BOOTSTRAP_ROLE}"
 [ -d "$BOOTSTRAP_DIR_ROLES" ] || bootstrap_die "The directory specified by BOOTSTRAP_DIR_ROLES does not exist ($BOOTSTRAP_DIR_ROLES)"
 [ -d "$BOOTSTRAP_DIR_ROLE" ] || bootstrap_die "${BOOTSTRAP_ROLE}: Not a valid role"
 
+# Create cache directory
+if [ ! -d "$BOOTSTRAP_DIR_CACHE" ]; then
+	mkdir -p $BOOTSTRAP_DIR_CACHE
+	(
+	echo "This is the cache and state directory for bootstrap-bash."
+	echo "You can reference this directory in module scripts as \$BOOTSTRAP_DIR_CACHE."
+	echo "Modifying the contents of this directory will cause modules to be reinstalled."
+	) >> "$BOOTSTRAP_DIR_CACHE/README"
+fi
+
+[ -d "$BOOTSTRAP_DIR_CACHE" ] || bootstrap_die "$BOOTSTRAP_DIR_CACHE: cache directory does not exist"
+
 init_module_names
 
 [ "${#BOOTSTRAP_MODULE_NAMES[@]}" -gt 0 ] || bootstrap_die "No modules selected"
@@ -334,16 +346,6 @@ if [ $BOOTSTRAP_GETOPT_PRINTMODULES -gt 0 ]; then
 
 	exit 0
 fi
-
-# Create cache directory
-if [ ! -d "$BOOTSTRAP_DIR_CACHE" ]; then
-	mkdir -p $BOOTSTRAP_DIR_CACHE
-	echo "This is the cache and state directory for bootstrap-bash." > "$BOOTSTRAP_DIR_CACHE/README"
-	echo "You can reference this directory in module scripts as \$BOOTSTRAP_DIR_CACHE." >> "$BOOTSTRAP_DIR_CACHE/README"
-	echo "Modifying the contents of this directory will cause modules to be reinstalled." >> "$BOOTSTRAP_DIR_CACHE/README"
-fi
-
-[ -d "$BOOTSTRAP_DIR_CACHE" ] || bootstrap_die "$BOOTSTRAP_DIR_CACHE: cache directory does not exist"
 
 echo "Executing bootstrap process for $BOOTSTRAP_ROLE role..."
 echo "Platform is $BOOTSTRAP_BASEARCH ($BOOTSTRAP_PROCARCH)"

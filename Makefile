@@ -11,7 +11,6 @@ install:
 	# Create directories
 	install -d $(DESTDIR)/$(SBINDIR)
 	install -d $(DESTDIR)/$(SHAREDIR)/lib
-	install -d $(DESTDIR)/$(STATEDIR)
 	install -d $(DESTDIR)/$(MANDIR)
 
 	# Install admin scripts
