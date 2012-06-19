@@ -106,26 +106,14 @@ function bootstrap_rpm_packages_install()
 	if [ ${#installrpmsnodeps[@]} -gt 0 ]; then
 		echo ""
 		bootstrap_echo_header "Installing RPM packages without checking dependencies..."
-
-		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
-			echo "${installrpmsnodeps[@]}" | xargs /bin/rpm -Uv --nodeps
-			[ ${PIPESTATUS[0]} -gt ${#installrpmsnodeps[@]} ] && bootstrap_die
-		else
-			echo "+ /bin/rpm -Uv --nodeps" "${installrpmsnodeps[@]}"
-		fi
+		bootstrap_rpm_installorupdate "--nodeps" "${installrpmsnodeps[@]}"
 	fi
 
 	# Install RPMs normally
 	if [ ${#installrpms[@]} -gt 0 ]; then
 		echo ""
 		bootstrap_echo_header "Installing RPM packages..."
-
-		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
-			echo "${installrpms[@]}" | xargs /bin/rpm -Uv
-			[ ${PIPESTATUS[0]} -gt ${#installrpms[@]} ] && bootstrap_die
-		else
-			echo "+ /bin/rpm -Uv" "${installrpms[@]}"
-		fi
+		bootstrap_rpm_installorupdate "" "${installrpms[@]}"
 	fi
 
 	if [ ${#installrpms[@]} -eq 0 ]  && [ ${#installrpmsnodeps[@]} -eq 0 ] && [ $skipped -gt 0 ]; then
@@ -139,4 +127,49 @@ function bootstrap_rpm_packages_install()
 	do
 		bootstrap_modules_set_state "$module" "rpm-install"
 	done
+}
+
+# bootstrap_rpm_installorupdate(options, array of rpms)
+# Install packages that are not installed and update packages that are
+function bootstrap_rpm_installorupdate()
+{
+	local options="$1"
+	local rpmpaths=( )
+	local rpmpath=""
+	local rpmname=""
+	local installrpms=( )
+	local updaterpms=( )
+
+	shift
+	rpmpaths=( "$@" )
+
+	# Determine which packages are installed already
+	for rpmpath in "${rpmpaths[@]}"; do
+		rpmname=$(rpm -qp --qf '%{name}' "$rpmpath" 2> /dev/null)
+		if /bin/rpm -q "$rpmname" >& /dev/null; then
+			updaterpms=( "${updaterpms[@]}" $rpmpath )
+		else
+			installrpms=( "${installrpms[@]}" $rpmpath )
+		fi
+	done
+
+	# Install new packages
+	if [ ${#installrpms[@]} -gt 0 ]; then
+		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
+			echo "${installrpms[@]}" | xargs /bin/rpm -iv $options
+			[ ${PIPESTATUS[0]} -gt ${#installrpms[@]} ] && bootstrap_die
+		else
+			echo "+ /bin/rpm -iv $options" "${installrpms[@]}"
+		fi
+	fi
+
+	# Update existing packages
+	if [ ${#updaterpms[@]} -gt 0 ]; then
+		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
+			echo "${updaterpms[@]}" | xargs /bin/rpm -Uv $options
+			[ ${PIPESTATUS[0]} -gt ${#updaterpms[@]} ] && bootstrap_die
+		else
+			echo "+ /bin/rpm -Uv $options" "${updaterpms[@]}"
+		fi
+	fi
 }
