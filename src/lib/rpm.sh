@@ -153,6 +153,17 @@ function bootstrap_rpm_installorupdate()
 		fi
 	done
 
+	# Update existing packages before installing new packages
+	# in case a new package depends on a new version of an updated package
+	if [ ${#updaterpms[@]} -gt 0 ]; then
+		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
+			echo "${updaterpms[@]}" | xargs /bin/rpm -Uv $options
+			[ ${PIPESTATUS[0]} -gt ${#updaterpms[@]} ] && bootstrap_die
+		else
+			echo "+ /bin/rpm -Uv $options" "${updaterpms[@]}"
+		fi
+	fi
+
 	# Install new packages
 	if [ ${#installrpms[@]} -gt 0 ]; then
 		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
@@ -160,16 +171,6 @@ function bootstrap_rpm_installorupdate()
 			[ ${PIPESTATUS[0]} -gt ${#installrpms[@]} ] && bootstrap_die
 		else
 			echo "+ /bin/rpm -iv $options" "${installrpms[@]}"
-		fi
-	fi
-
-	# Update existing packages
-	if [ ${#updaterpms[@]} -gt 0 ]; then
-		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
-			echo "${updaterpms[@]}" | xargs /bin/rpm -Uv $options
-			[ ${PIPESTATUS[0]} -gt ${#updaterpms[@]} ] && bootstrap_die
-		else
-			echo "+ /bin/rpm -Uv $options" "${updaterpms[@]}"
 		fi
 	fi
 }
