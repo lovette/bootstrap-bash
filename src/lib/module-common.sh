@@ -39,6 +39,36 @@ function bootstrap_list_active_modules()
 	[ -f "$BOOTSTRAP_DIR_CACHE/activemodulelist" ] && cat "$BOOTSTRAP_DIR_CACHE/activemodulelist"
 }
 
+##! @fn bootstrap_is_module_installed(string name)
+##! @brief Check if any actions have been taken for a module.
+##! @param name Module name
+##! @return Returns success if any actions have been taken.
+function bootstrap_is_module_installed()
+{
+	local module="$1"
+	local filecount=0
+	local checkmodulecachedir="${BOOTSTRAP_DIR_CACHE}/module-${module}"
+
+	[ -d "$checkmodulecachedir" ] && filecount=$(find "${checkmodulecachedir}" -type f -name "action-*" | wc -l)
+
+	[ $filecount -gt 0 ] && return 0
+	return 1
+}
+
+##! @fn bootstrap_echo_header(string message)
+##! @brief Prints section header message, with color if enabled
+##! @param message Header message
+function bootstrap_echo_header()
+{
+	local message="$1"
+
+	if [ -z "$BOOTSTRAP_TTYHEADER" ]; then
+		echo "$message"
+	else
+		echo -e "${BOOTSTRAP_TTYHEADER}${message}${BOOTSTRAP_TTYRESET}"
+	fi
+}
+
 ##########################################################################
 
 # Expand glob patterns which match no files to a null string
