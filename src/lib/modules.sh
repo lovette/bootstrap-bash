@@ -231,6 +231,7 @@ function bootstrap_modules_script_exec()
 	export BOOTSTRAP_DIR_MODULE
 	export BOOTSTRAP_DIR_MODULE_CACHE
 	export BOOTSTRAP_DIR_TMP
+	export BOOTSTRAP_DIR_CACHE
 
 	if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
 		(cd $BOOTSTRAP_DIR_MODULE && bash ${bashargs} ${script})

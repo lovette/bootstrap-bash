@@ -390,6 +390,9 @@ mkdir -p "$BOOTSTRAP_DIR_TMP" || bootstrap_die
 # Remove temp dir on exit
 trap "onexit" EXIT
 
+# Cache list of active modules
+echo "${BOOTSTRAP_MODULE_NAMES[@]}" > "$BOOTSTRAP_DIR_CACHE/activemodulelist"
+
 if [ $BOOTSTRAP_GETOPT_CONFIGONLY -ne 1 ]; then
 	[ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_preinstall "${BOOTSTRAP_MODULE_NAMES[@]}"
 
