@@ -209,6 +209,7 @@ a numerical order. Modules will be installed in order. The default order is
 based on the order they are listed in modules.txt. Explicitly defining an order
 allows subroles to install modules before or after inherited modules.
 
+
 Package Management
 ---
 Modules can contain text files defining package management operations.
@@ -276,13 +277,43 @@ The framework is not dependent on Yum and can easily be expanded to support
 other package management tools.
 
 
+Hooks
+---
+Modules can hook into various parts of the bootstrap process for further customization.
+Hooks are enabled in the Configuration File by defining an array variable for each hook.
+
+* Modules listed in variable `BOOTSTRAP_HOOK_INSTALLPACKAGES` will have their
+  `installpackages-hook.sh` script executed after default package management
+  is complete.
+
+* Modules listed in variable `BOOTSTRAP_HOOK_BEFOREINSTALL` will have their
+  `beforeinstall-hook.sh` script executed prior to any modules being installed.
+
+* Modules listed in variable `BOOTSTRAP_HOOK_AFTERINSTALL` will have their
+  `afterinstall-hook.sh` script executed after all modules have been installed.
+
+For example, to define modules that implement custom package management you would
+include this in your Configuration File:
+
+	BOOTSTRAP_HOOK_INSTALLPACKAGES=( modulename [modulename] [...] )
+
+Modules can use the convenience function `bootstrap_list_active_modules` to get
+a list of the modules being installed.
+
+Hook modules are normal modules and can be included in `modules.txt` with their
+own package management, installation and configuration scripts.
+
+
 Order of operations
 ---
-1. Modules are enumerated based on role, unless specified on the command line
-2. Module preinstall scripts are executed (preinstall.sh)
-3. Yum repositories are updated (yum-packages.txt)
-4. Yum packages are installed (yum-packages.txt)
-5. Yum packages are removed (yum-packages.txt)
-6. RPM packages are installed (rpm-packages.txt)
-7. Module install scripts are executed (install.sh)
-8. Module configuration scripts are executed (config.sh)
+1.  Modules are enumerated based on role, unless specified on the command line
+2.  Module preinstall scripts are executed (preinstall.sh)
+3.  Yum repositories are updated (yum-packages.txt)
+4.  Yum packages are installed (yum-packages.txt)
+5.  Yum packages are removed (yum-packages.txt)
+6.  RPM packages are installed (rpm-packages.txt)
+7.  Install packages hook scripts are executed (installpackages-hook.sh)
+8.  Before-install hook scripts are executed (beforeinstall-hook.sh)
+9.  Module install scripts are executed (install.sh)
+10. After-install hook scripts are executed (afterinstall-hook.sh)
+11. Module configuration scripts are executed (config.sh)
