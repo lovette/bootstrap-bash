@@ -23,6 +23,9 @@ BOOTSTRAP_BASEARCH=$(/bin/uname --hardware-platform)
 BOOTSTRAP_PROCARCH=$(/bin/uname --processor)
 BOOTSTRAP_MODULE_NAMES=( )
 BOOTSTRAP_INSTALL_FORCED=0
+BOOTSTRAP_HOOK_INSTALLPACKAGES=( )
+BOOTSTRAP_HOOK_BEFOREINSTALL=( )
+BOOTSTRAP_HOOK_AFTERINSTALL=( )
 BOOTSTRAP_GETOPT_CONFIG=""
 BOOTSTRAP_GETOPT_DRYRUN=0
 BOOTSTRAP_GETOPT_FORCE=0
@@ -401,6 +404,8 @@ if [ $BOOTSTRAP_GETOPT_CONFIGONLY -ne 1 ]; then
 	bootstrap_yum_packages_remove "${BOOTSTRAP_MODULE_NAMES[@]}"
 
 	bootstrap_rpm_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+
+	bootstrap_modules_exec_hook "install packages" "installpackages-hook.sh" "${BOOTSTRAP_HOOK_INSTALLPACKAGES[@]}"
 
 	[ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_install "${BOOTSTRAP_MODULE_NAMES[@]}"
 else

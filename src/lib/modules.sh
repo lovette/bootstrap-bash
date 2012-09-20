@@ -302,6 +302,8 @@ function bootstrap_modules_install()
 	local installscript=""
 	local configscript=""
 
+	bootstrap_modules_exec_hook "before install" "beforeinstall-hook.sh" "${BOOTSTRAP_HOOK_BEFOREINSTALL[@]}"
+
 	for module in "${modules[@]}";
 	do
 		moduledir="${BOOTSTRAP_DIR_MODULES}/${module}"
@@ -341,6 +343,8 @@ function bootstrap_modules_install()
 			fi
 		fi
 	done
+
+	bootstrap_modules_exec_hook "after install" "afterinstall-hook.sh" "${BOOTSTRAP_HOOK_AFTERINSTALL[@]}"
 }
 
 # bootstrap_modules_getorder(name)
@@ -354,4 +358,30 @@ function bootstrap_modules_getorder()
 	[ -f "$BOOTSTRAP_MODULES_MODULELISTPATH" ] || return 1
 
 	awk -v module="$module" '($2 == module) {print $1}' "$BOOTSTRAP_MODULES_MODULELISTPATH"
+}
+
+# bootstrap_modules_exec_hook(name, script, array of module names)
+function bootstrap_modules_exec_hook
+{
+	local module=""
+	local hookname="$1"
+	local hookscriptname="$2"
+	local modules=( )
+	local moduledir=""
+	local hookscriptpath=""
+
+	shift 2
+	modules=( "$@" )
+
+	[ "${#modules[@]}" -gt 0 ] || return
+
+	for module in "${modules[@]}";
+	do
+		moduledir="${BOOTSTRAP_DIR_MODULES}/${module}"
+		hookscriptpath="${moduledir}/${hookscriptname}"
+
+		[ -f "$hookscriptpath" ] || bootstrap_die "$module $hookname hook failed, $hookscriptname script not found"
+
+		bootstrap_modules_script_exec "$module" "$hookscriptpath"
+	done
 }
