@@ -189,25 +189,30 @@ Beneath each of those roles you could have a subrole for each specific type of
 server, such as "web" and "database".
 
 ### Files
-Each role directory contains a text file that defines the role modules.
+Each role directory contains a text file that defines the active modules for the role.
 
 #### modules.txt
 
 Text file listing names of modules that will be applied for the role.
+The following formats are accepted:
 
-	module|(module) [order]
+	module
+	(module)
+	module first|last
+	module before|after module
 
 Blank lines and comment lines beginning with "#" will be ignored.
 
 Optional modules can be specified by enclosing the name within parenthesis.
+These modules will only be installed when explicitly specified with `-m` option.
+
+The default installation order is based on the order modules are listed in `modules.txt`.
+The order can be explicitly controlled by assigning modules a relative order.
+Modules can be installed `first`, `last` or `before` or `after` another module.
+This allows subroles to install modules before or after inherited modules.
 
 The `modules.txt` file in each directory above a subrole will be applied when
 a role is selected. This allows for common modules to be defined in common role directories.
-
-The installation order of modules can be controlled by assigning the module
-a numerical order. Modules will be installed in order. The default order is
-based on the order they are listed in modules.txt. Explicitly defining an order
-allows subroles to install modules before or after inherited modules.
 
 
 Package Management

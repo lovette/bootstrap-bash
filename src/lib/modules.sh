@@ -144,35 +144,138 @@ function bootstrap_modules_build_list()
 	# Sort modules by order
 	(awk '
 		BEGIN {
-			order=0;
+			defaultorder=0;
 			filenum=1;
 			curfile="";
+			modulecount=0;
+			relcount=0;
+			minorder=999999;
+			maxorder=0;
 		}
 
 		{
 			# Each file gets a new range base
 			if (curfile != FILENAME)
-				order = filenum++ * 200;
+				defaultorder = filenum++ * 200;
 			curfile=FILENAME;
 
+			name=$1;
+			curorder=$2;
+
 			# Skip blank lines and comments
-			if ($1 == "")
+			if (name == "")
 				next;
-			if (substr($1, 1, 1) == "#")
+			if (substr(name, 1, 1) == "#")
 				next;
 
-			# If an order is not set explicitly, assign a default
-			if ($2 == "")
+			if (!match(curorder, "^(first|last|before|after)"))
 			{
-				printf("%06d\t", order);
-				order += 5
+				# If an order is not set explicitly, assign a default
+				if (!match(curorder, "^[0-9]+$"))
+				{
+					curorder = defaultorder;
+					defaultorder += 5
+				}
+
+				minorder = (curorder < minorder) ? curorder : minorder;
+				maxorder = (curorder > maxorder) ? curorder : maxorder;
 			}
 			else
 			{
-				printf("%06d\t", $2);
+				$1 = ""
+				curorder = $0
+				gsub(/^[ ]+/, "", curorder) # ltrim whitespace
+				relnames[relcount++] = name;
 			}
 
-			print $1;
+			modulenames[modulecount++] = name;
+			moduleorder[name] = curorder;
+		}
+
+		END {
+			# Assign first/last relative order a numeric order
+			for (i in relnames)
+			{
+				name = relnames[i];
+				curorder = moduleorder[name];
+
+				if (curorder == "first")
+				{
+					minorder--;
+					moduleorder[name] = minorder;
+					delete relnames[i];
+					relcount--;
+				}
+				else if (curorder == "last")
+				{
+					maxorder++;
+					moduleorder[name] = maxorder;
+					delete relnames[i];
+					relcount--;
+				}
+			}
+
+			while (relcount > 0)
+			{
+				for (i in relnames)
+				{
+					name = relnames[i];
+					curorder = moduleorder[name];
+
+					# Assign before/after relative order a numeric order
+					if (match(curorder, "(before|after) (.+)", parts))
+					{
+						if (parts[2] in moduleorder)
+						{
+							curorder = moduleorder[parts[2]];
+
+							# If relative to another relative, resolve later
+							if (!match(curorder, "^[0-9]+$"))
+								continue;
+
+							if (parts[1] == "before")
+							{
+								# Shift everything up
+								for (j in moduleorder)
+									if (match(moduleorder[j], "^[0-9]+$"))
+										if (moduleorder[j] >= curorder)
+											moduleorder[j]++;
+								maxorder++;
+							}
+							else if (parts[1] == "after")
+							{
+								# Shift everything down
+								for (j in moduleorder)
+									if (match(moduleorder[j], "^[0-9]+$"))
+										if (moduleorder[j] <= curorder)
+											moduleorder[j]--;
+								minorder--;
+							}
+
+							moduleorder[name] = curorder;
+						}
+						else
+						{
+							# Relative to unknown, put last
+							maxorder++;
+							moduleorder[name] = maxorder;
+						}
+					}
+					else
+					{
+						# Unknown directive, put last
+						maxorder++;
+						moduleorder[name] = maxorder;
+					}
+
+					delete relnames[i];
+					relcount--;
+				}
+
+			}
+
+			for (name in moduleorder)
+				printf("%06d\t%s\n", moduleorder[name], name);
 		}
 	' "${modulefiles[@]}" | sort) > "$BOOTSTRAP_MODULES_MODULELISTPATH"
 
