@@ -13,9 +13,9 @@ to install or remove.
 
 If you're looking for more power or automation, have a look at these tools:
 
-* [Chef](http://www.opscode.com/chef/)
-* [Puppet](http://puppetlabs.com/)
-* [Ansible](http://ansible.github.com/)
+* [Chef](https://www.chef.io/products/chef-infra)
+* [Puppet](https://puppet.com/)
+* [Ansible](https://www.ansible.com/)
 
 
 ### Basic Example
