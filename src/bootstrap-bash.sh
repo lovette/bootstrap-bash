@@ -14,7 +14,7 @@ CMDARGS=$@
 BOOTSTRAP_VER="1.1.1"
 BOOTSTRAP_ROLE=""
 BOOTSTRAP_DIR_ROOT="$CMDDIR"
-BOOTSTRAP_DIR_LIB="/usr/share/bootstrap-bash/lib"
+BOOTSTRAP_DIR_LIB=$(readlink -f "${BOOTSTRAP_DIR_ROOT}/../share/bootstrap-bash/lib")
 BOOTSTRAP_DIR_CACHE="/var/bootstrap-bash"
 BOOTSTRAP_DIR_CACHE_RPM="$BOOTSTRAP_DIR_CACHE/rpms"
 BOOTSTRAP_DIR_ROLE=""
@@ -239,10 +239,16 @@ esac
 # Expand glob patterns which match no files to a null string
 shopt -s nullglob
 
-# If run from the src directory, use local lib directory
-[ -f "${BOOTSTRAP_DIR_ROOT}/lib/modules.sh" ] && BOOTSTRAP_DIR_LIB="${BOOTSTRAP_DIR_ROOT}/lib"
+# Search for library scripts (helpful for non-default installs)
+# Default installs to /usr/share/bootstrap-bash/lib
+for p in "$BOOTSTRAP_DIR_LIB" "${BOOTSTRAP_DIR_ROOT}/lib" "${BOOTSTRAP_DIR_ROOT}/../lib" "${BOOTSTRAP_DIR_ROOT}/../share/lib";
+do
+	if [[ -d "${p}" && -f "${p}/modules.sh" ]]; then
+		BOOTSTRAP_DIR_LIB=$(readlink -f "${p}")
+	fi
+done
 
-[ -d "$BOOTSTRAP_DIR_LIB" ] || { echo "$BOOTSTRAP_DIR_LIB: directory does not exist"; exit 1; }
+[ -d "$BOOTSTRAP_DIR_LIB" ] || { echo "Cannot find 'lib' directory containing modules.sh"; exit 1; }
 
 source ${BOOTSTRAP_DIR_LIB}/bootstrap-util.sh
 source ${BOOTSTRAP_DIR_LIB}/modules.sh

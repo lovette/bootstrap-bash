@@ -93,7 +93,6 @@ The configuration file is a shell script that at minimum defines the following t
 
 These default variables may be overridden if necessary:
 
-	BOOTSTRAP_DIR_LIB="/usr/share/bootstrap-bash/lib"
 	BOOTSTRAP_DIR_CACHE="/var/bootstrap-bash"
 	BOOTSTRAP_DIR_CACHE_RPM="$BOOTSTRAP_DIR_CACHE/rpms"
 	BOOTSTRAP_DIR_TMP="/tmp/bootstrap-bash-$$.tmp"
