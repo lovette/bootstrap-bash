@@ -7,8 +7,6 @@
 #
 # Available from https://github.com/lovette/bootstrap-bash
 
-BOOTSTRAP_MODULES_MODULELISTPATH="$BOOTSTRAP_DIR_CACHE/modulelist"
-
 # bootstrap_modules_set_state(module name, action)
 # Creates module state file for an action
 function bootstrap_modules_set_state()

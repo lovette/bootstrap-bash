@@ -337,6 +337,8 @@ fi
 
 [ -d "$BOOTSTRAP_DIR_CACHE" ] || bootstrap_die "$BOOTSTRAP_DIR_CACHE: cache directory does not exist"
 
+BOOTSTRAP_MODULES_MODULELISTPATH="$BOOTSTRAP_DIR_CACHE/modulelist"
+
 init_module_names
 
 [ "${#BOOTSTRAP_MODULE_NAMES[@]}" -gt 0 ] || bootstrap_die "No modules selected"
