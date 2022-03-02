@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Copyright (c) 2011 Lance Lovette. All rights reserved.
 # Licensed under the BSD License.
