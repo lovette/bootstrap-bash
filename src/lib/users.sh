@@ -12,7 +12,7 @@
 
 ##! @fn bootstrap_user_exists(string name)
 ##! @brief Check if user name exists.
-##! @param name User name
+##! @param name User name or uid
 ##! @return Zero if user exists, non-zero otherwise
 function bootstrap_user_exists()
 {
@@ -21,24 +21,33 @@ function bootstrap_user_exists()
 
 ##! @fn bootstrap_user_group_exists(string name)
 ##! @brief Check if group name exists.
-##! @param name Group name
+##! @param name Group name or gid
 ##! @return Zero if group exists, non-zero otherwise
 function bootstrap_user_group_exists()
 {
 	/usr/bin/id -g "$1" &>/dev/null
 }
 
-##! @fn bootstrap_user_group_add(int uid, string name)
+##! @fn bootstrap_user_group_add(int gid, string name)
 ##! @brief Add a user group.
-##! @param uid Numerical group identifier
+##! @param gid Numerical group identifier
 ##! @param name Group name
 ##! @return Zero if group is added or already exists, calls `bootstrap_die` otherwise
 function bootstrap_user_group_add()
 {
-	local ADDGID=$1
-	local GNAME=$2
+	local ADDGID="$1"
+	local GNAME="$2"
+	local IDOUT=
 
-	if ! bootstrap_user_group_exists $GNAME; then
+	if bootstrap_user_group_exists "$GNAME"; then
+		# Group name exists, confirm it has requested GID
+		IDOUT=$(/usr/bin/id -g "$GNAME")
+		[[ "$IDOUT" == "$ADDGID" ]] || bootstrap_die "Cannot create group $GNAME($ADDGID): Group exists but has GID $IDOUT"
+	elif bootstrap_user_group_exists "$ADDGID"; then
+		# GID exists but with another name
+		IDOUT=$(/usr/bin/id -ng "$ADDGID")
+		bootstrap_die "Cannot create group $GNAME($ADDGID): GID $ADDGID refers to group '$IDOUT'"
+	else
 		/usr/sbin/groupadd -g "$ADDGID" "$GNAME"
 		[ $? -ne 0 ] && bootstrap_die
 	fi
