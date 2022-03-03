@@ -187,6 +187,7 @@ function bootstrap_file_move()
 ##! @param (optional) perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
 ##! @param (optional) overwrite Overwrite mode: 0=never, 1=always (default), 2=if newer or file size has changed
 ##! @note No-op if `destpath` exists unless `overwrite` is non-zero
+##! @note If `destpath` is an existing directory, file will be copied there using the same name.
 ##! @note Timestamps are preserved
 ##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
 ##! @return Zero if successful, calls `bootstrap_die` otherwise
@@ -207,6 +208,12 @@ function bootstrap_file_copy()
 	[ $# -ge 5 ] && overwrite="$5"
 
 	[ -f "$srcpath" ] || bootstrap_die "cannot copy file: $srcpath does not exist"
+
+	# If dest is a directory, copy the file there with the same name
+	if [ -d "$destpath" ]; then
+		destbasename="$srcbasename"
+		destpath=$(readlink -f "${destpath}/${destbasename}")
+	fi
 
 	case "$overwrite" in
 		"0")
