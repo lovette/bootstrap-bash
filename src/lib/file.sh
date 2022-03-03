@@ -48,7 +48,7 @@ function bootstrap_file_chown()
 ##! @brief Create directory with specified permissions and ownership
 ##! @param path New directory path; all path components will be created
 ##! @param owner (optional) Directory owner; set to empty string for default
-##! @param perms File permissions; `man chmod` for allowed formats; set to 0 for default
+##! @param perms (optional) File permissions; `man chmod` for allowed formats; set to 0 for default
 ##! @note No-op if directory already exists
 ##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_mkdir()
@@ -60,15 +60,15 @@ function bootstrap_mkdir()
 	if [ $# -ge 3 ]; then
 		dirowner=$2
 		dirmod=$3
-	else
+	elif [ $# -ge 2 ]; then
 		dirmod=$2
 	fi
 
 	if [ ! -d "$dirpath" ]; then
 		/bin/mkdir -p $dirpath
 		[ $? -ne 0 ] && bootstrap_die
-		bootstrap_dir_chmod $dirpath $dirmod $dirmod
-		bootstrap_dir_chown "$dirpath" "$dirowner"
+		[ -n "$dirmod" ] && bootstrap_dir_chmod "$dirpath" $dirmod $dirmod
+		[ -n "$dirowner" ] && bootstrap_dir_chown "$dirpath" "$dirowner"
 		echo " * mkdir ${dirpath}/"
 	fi
 }
@@ -183,24 +183,28 @@ function bootstrap_file_move()
 ##! @brief Copy a file
 ##! @param srcpath Source file path
 ##! @param destpath Destination file path
-##! @param owner New file ownership; set to empty string to preserve
-##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
-##! @param overwrite Overwrite mode: 0=never, 1=always, 2=if newer or file size has changed
+##! @param (optional) owner New file ownership; set to empty string to preserve
+##! @param (optional) perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
+##! @param (optional) overwrite Overwrite mode: 0=never, 1=always (default), 2=if newer or file size has changed
 ##! @note No-op if `destpath` exists unless `overwrite` is non-zero
 ##! @note Timestamps are preserved
 ##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
 ##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_copy()
 {
-	local srcpath=$1
-	local destpath=$2
-	local fileowner=$3
-	local filemod=$4
-	local overwrite=$5
+	local srcpath="$1"
+	local destpath="$2"
+	local fileowner=
+	local filemod=
+	local overwrite=1
 	local docopy=0
 	local skipreason=""
 	local srcbasename=$(basename "$srcpath")
 	local destbasename=$(basename "$destpath")
+
+	[ $# -ge 3 ] && fileowner="$3"
+	[ $# -ge 4 ] && filemod="$4"
+	[ $# -ge 5 ] && overwrite="$5"
 
 	[ -f "$srcpath" ] || bootstrap_die "cannot copy file: $srcpath does not exist"
 
@@ -222,8 +226,8 @@ function bootstrap_file_copy()
 		/bin/cp --remove-destination --preserve=timestamps "$srcpath" "$destpath"
 		[ $? -ne 0 ] && bootstrap_die
 
-		bootstrap_file_chown "$destpath" "$fileowner"
-		bootstrap_file_chmod "$destpath" $filemod
+		[ -n "$fileowner" ] && bootstrap_file_chown "$destpath" "$fileowner"
+		[ -n "$filemod" ] && bootstrap_file_chmod "$destpath" $filemod
 
 		[ -n "$BOOTSTRAP_ECHO_STRIPPATH" ] && srcpath="${srcpath/#$BOOTSTRAP_ECHO_STRIPPATH/...}"
 		[ -n "$BOOTSTRAP_DIR_MODULE" ] && srcpath="${srcpath/#$BOOTSTRAP_DIR_MODULE/[module] }"
@@ -244,25 +248,30 @@ function bootstrap_file_copy()
 ##! @param srcdir Source directory path
 ##! @param destdir Destination directory path
 ##! @param glob File pattern (e.g * or *.txt)
-##! @param owner New file ownership; set to empty string to preserve
-##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
-##! @param overwrite Overwrite mode: 0=never, 1=always, 2=if file size has changed
-##! @param removesuffix File name suffix to remove in destination path
+##! @param (optional) owner New file ownership; set to empty string to preserve
+##! @param (optional) perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
+##! @param (optional) overwrite Overwrite mode: 0=never, 1=always, 2=if file size has changed
+##! @param (optional) removesuffix File name suffix to remove in destination path
 ##! @note `srcdir` must exist and be readable
 ##! @note `destdir` must exist and be writable
 ##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
 ##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_copy_glob()
 {
-	local srcdir=$1
-	local destdir=$2
+	local srcdir="$1"
+	local destdir="$2"
 	local glob=$3
-	local owner=$4
-	local perms=$5
-	local overwrite=$6
-	local removesuffix=$7
+	local owner=
+	local perms=
+	local overwrite=
+	local removesuffix=
 	local path=
 	local name=
+
+	[ $# -ge 4 ] && owner="$4"
+	[ $# -ge 5 ] && perms=$5
+	[ $# -ge 6 ] && overwrite=$6
+	[ $# -ge 7 ] && removesuffix="$7"
 
 	# Remove trailing slashes
 	srcdir=${srcdir%%/}
@@ -312,21 +321,24 @@ function bootstrap_file_link()
 ##! @fn bootstrap_file_create(string path, string owner, string|int perms)
 ##! @brief Create empty file using `touch`.
 ##! @param path New file path
-##! @param owner New file ownership; set to empty string for default
-##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 for default
+##! @param (optional) owner New file ownership; set to empty string for default
+##! @param (optional) perms New file permissions; `man chmod` for allowed formats; set to 0 for default
 ##! @note No-op if `path` exists
 ##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_create()
 {
-	local filepath=$1
-	local fileowner=$2
-	local filemod=$3
+	local filepath="$1"
+	local fileowner=
+	local filemod=
+
+	[ $# -ge 2 ] && fileowner="$2"
+	[ $# -ge 3 ] && filemod="$3"
 
 	if [ ! -f "$filepath" ]; then
 		/bin/touch "$filepath"
 		[ $? -ne 0 ] && bootstrap_die
-		bootstrap_file_chown "$filepath" "$fileowner"
-		bootstrap_file_chmod "$filepath" $filemod
+		[ -n "$fileowner" ] && bootstrap_file_chown "$filepath" "$fileowner"
+		[ -n "$filemod" ] && bootstrap_file_chmod "$filepath" $filemod
 		echo " * touch'd $filepath"
 	fi
 }
