@@ -67,8 +67,17 @@ function bootstrap_user_add_system()
 	local UNAME="$2"
 	local UCOMMENT="$3"
 	local UHOME="$4"
+	local IDOUT=
 
-	if ! bootstrap_user_exists $UNAME; then
+	if bootstrap_user_exists $UNAME; then
+		# User name exists, confirm it has requested UID
+		IDOUT=$(/usr/bin/id -u "$UNAME")
+		[[ "$IDOUT" == "$ADDUID" ]] || bootstrap_die "Cannot create user $UNAME($ADDUID): User exists but has UID $IDOUT"
+	elif bootstrap_user_exists "$ADDUID"; then
+		# UID exists but with another name
+		IDOUT=$(/usr/bin/id -nu "$ADDUID")
+		bootstrap_die "Cannot create user $UNAME($ADDUID): UID $ADDUID refers to user '$IDOUT'"
+	else
 		bootstrap_user_group_add $ADDUID $UNAME
 		/usr/sbin/useradd -M -r -N -u $ADDUID -g $UNAME -c "$UCOMMENT" -d "$UHOME" -s /sbin/nologin $UNAME
 		[ $? -ne 0 ] && bootstrap_die
