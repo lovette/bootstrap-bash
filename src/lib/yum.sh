@@ -37,17 +37,17 @@ function bootstrap_yum_repos_add()
 
 			if [ -n "$rpmrepos" ] || [ -n "$txtrepos" ]; then
 				if [ $forced -eq 1 ] || ! bootstrap_modules_check_state "$module" "yum-repo-add"; then
-					[ -n "$rpmrepos" ] && rpms=( "${rpms[@]}" $rpmrepos )
+					[ -n "$rpmrepos" ] && rpms+=($rpmrepos)
 					if [ -n "$txtrepos" ]; then
 						txtrepos=( "$txtrepos" )
 						for reponame in "${txtrepos[@]}";
 						do
 							# Prepend module path to given path if it is relative
 							[[ $reponame != /* ]] && reponame="${moduledir}/${reponame}"
-							copyfiles=( "${copyfiles[@]}" $reponame )
+							copyfiles+=($reponame)
 						done
 					fi
-					installedmodules=( "${installedmodules[@]}" $module )
+					installedmodules+=($module)
 				else
 					let skipped++
 				fi
@@ -119,8 +119,8 @@ function bootstrap_yum_packages_remove()
 			removepackages=$(grep "^-" "$packagefilepath" | sed -r "s/^-(.+)/\1/" | tr -s '[:space:]' ' ')
 			if [ -n "$removepackages" ]; then
 				if [ $forced -eq 1 ] || ! bootstrap_modules_check_state "$module" "yum-remove"; then
-					packages=( "${packages[@]}" $removepackages )
-					installedmodules=( "${installedmodules[@]}" $module )
+					packages+=($removepackages)
+					installedmodules+=($module)
 				else
 					let skipped++
 				fi
@@ -191,7 +191,7 @@ function bootstrap_yum_packages_install()
 							echo "- $packagename" >> $packagelistcache
 						fi
 					done
-					installedmodules=( "${installedmodules[@]}" $module )
+					installedmodules+=($module)
 				else
 					let skipped++
 				fi

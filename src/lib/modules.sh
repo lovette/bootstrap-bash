@@ -127,7 +127,7 @@ function bootstrap_modules_build_list()
 	BOOTSTRAP_ROLE_OPTIONAL_MODULES=( )
 
 	filepath="${BOOTSTRAP_DIR_ROLES}/modules.txt"
-	[ -f "$filepath" ] && modulefiles[${#modulefiles[@]}]="$filepath"
+	[ -f "$filepath" ] && modulefiles+=("$filepath")
 
 	# Split the role path into directory parts and reference
 	# modules.txt for each directory in the path
@@ -135,7 +135,7 @@ function bootstrap_modules_build_list()
 	IFS='/' read -ra pathparts <<< "${BOOTSTRAP_DIR_ROLE##$rolepath/}"
 	for pathpart in "${pathparts[@]}"; do
 		filepath="${rolepath}/${pathpart}/modules.txt"
-		[ -f "$filepath" ] && modulefiles[${#modulefiles[@]}]="$filepath"
+		[ -f "$filepath" ] && modulefiles+=("$filepath")
 		rolepath="${rolepath}/${pathpart}"
 	done
 
@@ -148,11 +148,11 @@ function bootstrap_modules_build_list()
 	for module in $modules; do
 		if [[ $module =~ $REGEX_OPTIONAL_MODULE ]]; then
 			# Modules in parenthesis are optional
-			BOOTSTRAP_ROLE_ALL_MODULES=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} ${BASH_REMATCH[1]} )
-			BOOTSTRAP_ROLE_OPTIONAL_MODULES=( ${BOOTSTRAP_ROLE_OPTIONAL_MODULES[@]} ${BASH_REMATCH[1]} )
+			BOOTSTRAP_ROLE_ALL_MODULES+=(${BASH_REMATCH[1]})
+			BOOTSTRAP_ROLE_OPTIONAL_MODULES+=(${BASH_REMATCH[1]})
 		else
-			BOOTSTRAP_ROLE_ALL_MODULES=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} $module )
-			BOOTSTRAP_ROLE_DEFAULT_MODULES=( ${BOOTSTRAP_ROLE_DEFAULT_MODULES[@]} $module )
+			BOOTSTRAP_ROLE_ALL_MODULES+=($module)
+			BOOTSTRAP_ROLE_DEFAULT_MODULES+=($module)
 		fi
 	done
 }

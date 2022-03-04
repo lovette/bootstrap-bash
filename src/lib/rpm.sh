@@ -57,7 +57,7 @@ function bootstrap_rpm_packages_install()
 						if [[ "$rpmpath" =~ $REMOTEPATHREGEX ]]; then
 							rpmname=$(basename "$rpmpath")
 							localpath="$BOOTSTRAP_DIR_CACHE_RPM/$rpmname"
-							[ ! -f "$localpath" ] && dlrpms=( "${dlrpms[@]}" $rpmpath )
+							[ ! -f "$localpath" ] && dlrpms+=($rpmpath)
 						elif [[ $rpmpath != /* ]]; then
 							localpath="${moduledir}/${rpmpath}"
 						else
@@ -65,12 +65,12 @@ function bootstrap_rpm_packages_install()
 						fi
 
 						if [ $optionnodeps -eq 1 ]; then
-							installrpmsnodeps=( "${installrpmsnodeps[@]}" $localpath )
+							installrpmsnodeps+=($localpath)
 						else
-							installrpms=( "${installrpms[@]}" $localpath )
+							installrpms+=($localpath)
 						fi
 					done
-					installedmodules=( "${installedmodules[@]}" $module )
+					installedmodules+=($module)
 				else
 					let skipped++
 				fi
@@ -147,9 +147,9 @@ function bootstrap_rpm_installorupdate()
 	for rpmpath in "${rpmpaths[@]}"; do
 		rpmname=$(rpm -qp --qf '%{name}' "$rpmpath" 2> /dev/null)
 		if /bin/rpm -q "$rpmname" >& /dev/null; then
-			updaterpms=( "${updaterpms[@]}" $rpmpath )
+			updaterpms+=($rpmpath)
 		else
-			installrpms=( "${installrpms[@]}" $rpmpath )
+			installrpms+=($rpmpath)
 		fi
 	done
 

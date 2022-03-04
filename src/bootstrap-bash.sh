@@ -107,11 +107,11 @@ function confirm()
 	for module in "${BOOTSTRAP_MODULE_NAMES[@]}";
 	do
 		if ! bootstrap_modules_is_installed "$module"; then
-			INSTALLMODULES=( "${INSTALLMODULES[@]}" "$module" )
+			INSTALLMODULES+=("$module")
 		elif [ $BOOTSTRAP_GETOPT_FORCE -eq 1 ]; then
-			REINSTALLMODULES=( "${REINSTALLMODULES[@]}" "$module" )
+			REINSTALLMODULES+=("$module")
 		else
-			REFRESHMODULES=( "${REFRESHMODULES[@]}" "$module" )
+			REFRESHMODULES+=("$module")
 		fi
 	done
 
@@ -196,7 +196,7 @@ function init_module_names()
 			do
 				if [[ $rolemodule == $modulespec ]]; then
 					validmodule=1
-					selectedmodules=( "${selectedmodules[@]}" $rolemodule )
+					selectedmodules+=($rolemodule)
 				fi
 			done
 
@@ -209,7 +209,7 @@ function init_module_names()
 			for module in "${selectedmodules[@]}";
 			do
 				if [ "$rolemodule" == "$module" ]; then
-					BOOTSTRAP_MODULE_NAMES=( "${BOOTSTRAP_MODULE_NAMES[@]}" $module )
+					BOOTSTRAP_MODULE_NAMES+=($module)
 				fi
 			done
 		done
@@ -265,7 +265,7 @@ do
 	f  ) BOOTSTRAP_GETOPT_FORCE=1;;
 	h  ) usage;;
 	l  ) let BOOTSTRAP_GETOPT_PRINTMODULES++;;
-	m  ) BOOTSTRAP_GETOPT_MODULE_NAMES[${#BOOTSTRAP_GETOPT_MODULE_NAMES[@]}]=$OPTARG;;
+	m  ) BOOTSTRAP_GETOPT_MODULE_NAMES+=($OPTARG);;
 	O  ) BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES=1;;
 	p  ) BOOTSTRAP_GETOPT_PACKAGESONLY=1; BOOTSTRAP_GETOPT_FORCE=0;;
 	s  ) BOOTSTRAP_GETOPT_DRYRUN=1; BOOTSTRAP_GETOPT_PRINTSCRIPTS=1;;
