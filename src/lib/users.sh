@@ -101,8 +101,17 @@ function bootstrap_user_add_login()
 	local UCOMMENT="$3"
 	local UPASSPLAIN="$4"
 	local UPASSCRYPT=$(perl -e 'print crypt($ARGV[0], "password")' $UPASSPLAIN)
+	local IDOUT=
 
-	if ! bootstrap_user_exists $UNAME; then
+	if bootstrap_user_exists $UNAME; then
+		# User name exists, confirm it has requested UID
+		IDOUT=$(/usr/bin/id -u "$UNAME")
+		[[ "$IDOUT" == "$ADDUID" ]] || bootstrap_die "Cannot create user $UNAME($ADDUID): User exists but has UID $IDOUT"
+	elif bootstrap_user_exists "$ADDUID"; then
+		# UID exists but with another name
+		IDOUT=$(/usr/bin/id -nu "$ADDUID")
+		bootstrap_die "Cannot create user $UNAME($ADDUID): UID $ADDUID refers to user '$IDOUT'"
+	else
 		bootstrap_user_group_add $ADDUID $UNAME
 		/usr/sbin/useradd -u $ADDUID -g $UNAME -c "$UCOMMENT" -m -N -s /bin/bash -G users -p $UPASSCRYPT $UNAME
 		[ $? -ne 0 ] && bootstrap_die
