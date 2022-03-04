@@ -45,10 +45,14 @@ Repeat this process to create a module for each server component or software pac
 you want to manage and bootstrap-bash will take care of running specific
 modules based on the selected server "role".
 
+
 Requirements
 ---
 
 * [BASH 3.0 or later](http://www.gnu.org/software/bash/) or compatible shell
+* AWK that supports `match` with regular expression captures
+
+Will not run on *macOS* because it does not (yet) support `readlink -f`.
 
 
 Installation
