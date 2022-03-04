@@ -44,6 +44,7 @@ function bootstrap_file_chown()
 	fi
 }
 
+##! @fn bootstrap_mkdir(string path, string|int perms)
 ##! @fn bootstrap_mkdir(string path, string owner, string|int perms)
 ##! @brief Create directory with specified permissions and ownership
 ##! @param path New directory path; all path components will be created
