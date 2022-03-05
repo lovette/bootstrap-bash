@@ -30,8 +30,8 @@ Here are the commands you might execute in a shell to build PHP CLI SAPI:
 	make
 	make install
 
-Or, if you want better error handling, progress output and an audit trail,
-you can take this one step further and use some built-in convenience functions:
+Or, alongside regular shell commands, you can use some built-in convenience functions to get 
+better error handling, progress output and an audit trail.
 
 	bootstrap_file_wget  http://us.php.net/distributions/php-5.3.6.tar.gz /tmp/php-5.3.6.tar.gz
 	bootstrap_file_untar /tmp/php-5.3.6.tar.gz /tmp/php-5.3.6 root:root
