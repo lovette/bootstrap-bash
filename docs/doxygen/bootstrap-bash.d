@@ -246,6 +246,7 @@ EXTENSION_MAPPING      =
 # The output of markdown processing is further processed by doxygen, so you
 # can mix doxygen, HTML, and XML commands with Markdown formatting.
 # Disable only in case of backward compatibilities issues.
+EXTENSION_MAPPING      = sh=C
 
 MARKDOWN_SUPPORT       = YES
 
