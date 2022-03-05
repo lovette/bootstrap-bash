@@ -25,8 +25,8 @@
 *
 * @section availablemodules Available modules:
 *
-* * module-common.sh - @copybrief module-common.sh
-* * build.sh - @copybrief build.sh
-* * file.sh - @copybrief file.sh
-* * users.sh - @copybrief users.sh
+* * module-common.sh
+* * build.sh
+* * file.sh
+* * users.sh
 */
