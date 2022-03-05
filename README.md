@@ -70,7 +70,7 @@ You can undo the install with:
 Usage
 ---
 
-	bootstrap-bash [OPTION]... -c CONFIGFILE ROLE
+	bootstrap-bash [OPTION]... -c CONFIGPATH ROLE
 
 Run the command with `--help` argument or see bootstrap-bash(8) for available OPTIONS.
 
@@ -79,14 +79,18 @@ Getting Started
 ---
 Getting started is easy.
 
-1. Create a configuration file
+1. Create a configuration file (optional)
 2. Create a directory containing one or more modules
 3. Create a directory containing one or more roles
 
 
 Configuration File
 ---
-The configuration file is a shell script that can customize default configuration variables.
+An optional configuration file can be created to customize default configuration variables
+and define (and export) any other global variables that modules can reference.
+This is a normal shell script that is sourced at runtime.
+If the `-c` argument is a directory, a file named `bootstrap.conf` can be
+placed in the directory or an `etc` subdirectory.
 
 These default variables may be overridden if necessary:
 
@@ -95,9 +99,6 @@ These default variables may be overridden if necessary:
 	BOOTSTRAP_DIR_CACHE="/var/bootstrap-bash"
 	BOOTSTRAP_DIR_CACHE_RPM="$BOOTSTRAP_DIR_CACHE/rpms"
 	BOOTSTRAP_DIR_TMP="/tmp/bootstrap-bash-$$.tmp"
-
-The script can also define (and export) any other global variables that the module
-installation scripts need to reference.
 
 
 Modules

@@ -69,12 +69,12 @@ function usage()
 	echo "A simple server bootstrap and configuration framework based on BASH scripts."
 	echo ""
 	echo "Usage: bootstrap-bash [-h | --help | -V | --version]"
-	echo "   or: bootstrap-bash [OPTION]... -c CONFIGFILE ROLE"
+	echo "   or: bootstrap-bash [OPTION]... -c CONFIGPATH ROLE"
 	echo ""
-	echo "Run bootstrap process for ROLE with CONFIGFILE configuration."
+	echo "Run bootstrap process for ROLE with CONFIGPATH configuration."
 	echo ""
 	echo "Options:"
-	echo "  -c FILE        Configuration file to use"
+	echo "  -c PATH        Path to configuration file or directory"
 	echo "  -d             Debug: show commands that would be executed (pseudo dry run)"
 	echo "  -f             Force run module install scripts, even if they have run before"
 	echo "  -h, --help     Show this help and exit"
@@ -282,9 +282,9 @@ BOOTSTRAP_ROLE="$1"
 
 [[ $(id -u) -eq 0 ]] || { echo "$CMDNAME: You must be root user to run this script."; exit 1; }
 
-# Configuration file option is required
+# Path to a configuration file or directory option is required
 if [ -z "${BOOTSTRAP_GETOPT_CONFIG}" ]; then
-	echo "$CMDNAME: missing option -- a configuration file must be specified"
+	echo "$CMDNAME: missing option -- a configuration path must be specified"
 	echo "Try '$CMDNAME --help' for more information."
 	exit 1
 fi
@@ -298,14 +298,27 @@ fi
 
 # Convert config to full path
 BOOTSTRAP_GETOPT_CONFIG=$(readlink -f "$BOOTSTRAP_GETOPT_CONFIG")
-BOOTSTRAP_DIR_CONFIG=$(dirname "$BOOTSTRAP_GETOPT_CONFIG")
 
-# Verify configuration file exists
-[ -f "${BOOTSTRAP_GETOPT_CONFIG}" ] || bootstrap_die "${BOOTSTRAP_GETOPT_CONFIG}: Configuration file not found"
-[ -r "${BOOTSTRAP_GETOPT_CONFIG}" ] || bootstrap_die "${BOOTSTRAP_GETOPT_CONFIG}: Configuration file not readable"
+if [ -d "${BOOTSTRAP_GETOPT_CONFIG}" ]; then
+	BOOTSTRAP_DIR_CONFIG="$BOOTSTRAP_GETOPT_CONFIG"
+	BOOTSTRAP_GETOPT_CONFIG=""
+
+	# Search for configuration file
+	for p in "${BOOTSTRAP_DIR_CONFIG}/bootstrap.conf" "${BOOTSTRAP_DIR_CONFIG}/etc/bootstrap.conf";
+	do
+		[ -f "${p}" ] && BOOTSTRAP_GETOPT_CONFIG=$(readlink -f "${p}")
+	done
+elif [ -f "${BOOTSTRAP_GETOPT_CONFIG}" ]; then
+	BOOTSTRAP_DIR_CONFIG=$(dirname "$BOOTSTRAP_GETOPT_CONFIG" )
+else
+	bootstrap_die "${BOOTSTRAP_GETOPT_CONFIG}: Configuration path is not a file or directory"
+fi
 
 # Import configuration file
-source $BOOTSTRAP_GETOPT_CONFIG
+if [ -n "${BOOTSTRAP_GETOPT_CONFIG}" ]; then
+	[ -r "${BOOTSTRAP_GETOPT_CONFIG}" ] || bootstrap_die "${BOOTSTRAP_GETOPT_CONFIG}: Configuration file not readable"
+	source $BOOTSTRAP_GETOPT_CONFIG
+fi
 
 if [ -z "$BOOTSTRAP_DIR_MODULES" ]; then
 	# Search for modules directory
