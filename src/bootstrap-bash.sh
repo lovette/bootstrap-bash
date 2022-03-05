@@ -69,9 +69,9 @@ function usage()
 	echo "A simple server bootstrap and configuration framework based on BASH scripts."
 	echo ""
 	echo "Usage: bootstrap-bash [-h | --help | -V | --version]"
-	echo "   or: bootstrap-bash [OPTION]... -c CONFIGPATH ROLE"
+	echo "   or: bootstrap-bash [OPTION]... -c CONFIGPATH [ROLE]"
 	echo ""
-	echo "Run bootstrap process for ROLE with CONFIGPATH configuration."
+	echo "Run bootstrap process with CONFIGPATH configuration for ROLE (optional)."
 	echo ""
 	echo "Options:"
 	echo "  -c PATH        Path to configuration file or directory"
@@ -278,20 +278,13 @@ done
 
 # Final command line option is the role
 shift $(($OPTIND - 1))
-BOOTSTRAP_ROLE="$1"
+[ $# -ge 1 ] && BOOTSTRAP_ROLE="$1"
 
 [[ $(id -u) -eq 0 ]] || { echo "$CMDNAME: You must be root user to run this script."; exit 1; }
 
 # Path to a configuration file or directory option is required
 if [ -z "${BOOTSTRAP_GETOPT_CONFIG}" ]; then
 	echo "$CMDNAME: missing option -- a configuration path must be specified"
-	echo "Try '$CMDNAME --help' for more information."
-	exit 1
-fi
-
-# Role option is required
-if [ -z "${BOOTSTRAP_ROLE}" ]; then
-	echo "$CMDNAME: missing option -- a role must be specified"
 	echo "Try '$CMDNAME --help' for more information."
 	exit 1
 fi
@@ -326,6 +319,8 @@ if [ -z "$BOOTSTRAP_DIR_MODULES" ]; then
 	do
 		[ -d "${p}" ] && BOOTSTRAP_DIR_MODULES=$(readlink -f "${p}")
 	done
+
+	[ -n "$BOOTSTRAP_DIR_MODULES" ] || bootstrap_die "The 'modules' directory cannot be determined; you should set config var BOOTSTRAP_DIR_MODULES"
 else
 	BOOTSTRAP_DIR_MODULES=$(readlink -f "$BOOTSTRAP_DIR_MODULES")
 	[ -d "$BOOTSTRAP_DIR_MODULES" ] || bootstrap_die "The directory specified by BOOTSTRAP_DIR_MODULES does not exist ($BOOTSTRAP_DIR_MODULES)"
@@ -342,12 +337,19 @@ else
 	[ -d "$BOOTSTRAP_DIR_ROLES" ] || bootstrap_die "The directory specified by BOOTSTRAP_DIR_ROLES does not exist ($BOOTSTRAP_DIR_ROLES)"
 fi
 
-BOOTSTRAP_DIR_ROLE="${BOOTSTRAP_DIR_ROLES}/${BOOTSTRAP_ROLE}"
-
-# Confirm paths exist
-[ -d "$BOOTSTRAP_DIR_MODULES" ] || bootstrap_die "The 'modules' directory cannot be determined; you should set config var BOOTSTRAP_DIR_MODULES"
-[ -d "$BOOTSTRAP_DIR_ROLES" ] || bootstrap_die "The 'roles' directory cannot be determined; you should set config var BOOTSTRAP_DIR_ROLES"
-[ -d "$BOOTSTRAP_DIR_ROLE" ] || bootstrap_die "${BOOTSTRAP_ROLE}: Not a valid role"
+if [ -n "$BOOTSTRAP_ROLE" ]; then
+	BOOTSTRAP_DIR_ROLE="${BOOTSTRAP_DIR_ROLES}/${BOOTSTRAP_ROLE}"
+	[ -n "$BOOTSTRAP_DIR_ROLES" ] || bootstrap_die "ROLE argument is specified but no 'roles' are defined"
+	[ -d "$BOOTSTRAP_DIR_ROLE" ] || bootstrap_die "${BOOTSTRAP_ROLE}: Not a valid role"
+	[ -f "${BOOTSTRAP_DIR_MODULES}/modules.txt" ] && bootstrap_die "${BOOTSTRAP_DIR_MODULES} should not contain modules.txt when roles are defined"
+elif [ -n "$BOOTSTRAP_DIR_ROLES" ]; then
+	bootstrap_die "${BOOTSTRAP_DIR_ROLES}: ROLE argument must be specified when 'roles' are defined"
+elif [ -f "${BOOTSTRAP_DIR_MODULES}/modules.txt" ]; then
+	BOOTSTRAP_DIR_ROLES="$BOOTSTRAP_DIR_MODULES"
+	BOOTSTRAP_DIR_ROLE="$BOOTSTRAP_DIR_ROLES"
+else
+	bootstrap_die "${BOOTSTRAP_DIR_MODULES} must contain modules.txt when no roles are defined"
+fi
 
 # Create cache directory
 if [ ! -d "$BOOTSTRAP_DIR_CACHE" ]; then
@@ -382,7 +384,7 @@ if [ $BOOTSTRAP_GETOPT_PRINTMODULES -gt 0 ]; then
 	exit 0
 fi
 
-echo "Executing bootstrap process for $BOOTSTRAP_ROLE role..."
+echo "Executing bootstrap process for ${BOOTSTRAP_ROLE:-default} role..."
 echo "Platform is $BOOTSTRAP_BASEARCH ($BOOTSTRAP_PROCARCH)"
 
 if [ $BOOTSTRAP_GETOPT_CONFIGONLY -eq 1 ] && [ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ]; then

@@ -97,7 +97,7 @@ Notice for some images you must replace `mawk` with `gawk` because `bootstrap-ba
 Usage
 ---
 
-	bootstrap-bash [OPTION]... -c CONFIGPATH ROLE
+	bootstrap-bash [OPTION]... -c CONFIGPATH [ROLE]
 
 Run the command with `--help` argument or see bootstrap-bash(8) for available OPTIONS.
 
@@ -108,7 +108,7 @@ Getting started is easy.
 
 1. Create a configuration file (optional)
 2. Create a directory containing one or more modules
-3. Create a directory containing one or more roles
+3. Create a directory containing one or more roles (optional)
 
 
 Configuration File
@@ -137,6 +137,9 @@ configuration and package management for the module.
 	modules/
 	|- <module name>/
 	|...
+
+If you are not using roles, simply create a `modules.txt` in the root `modules` directory. 
+To control the modules selected for multiple roles, create a `roles` directory as outlined below.
 
 ### Files
 Each module directory contains one or more shell scripts or text files that
@@ -182,7 +185,7 @@ The following global variables are available to `preinstall.sh`, `install.sh`
 and `config.sh` scripts:
 
 * `BOOTSTRAP_MODULE_NAME` - The name of the module being installed
-* `BOOTSTRAP_ROLE` - The active role being installed
+* `BOOTSTRAP_ROLE` - The active role being installed; can be blank.
 * `BOOTSTRAP_BASEARCH` - The server hardware (base) architecture (e.g. i386, x86_64)
 * `BOOTSTRAP_PROCARCH` - The server processor architecture (e.g. i686, x86_64)
 * `BOOTSTRAP_INSTALL_FORCED` - The install is being run for the first time or with the `-f` option
@@ -202,7 +205,9 @@ You can use the convenience function `bootstrap_die` to exit with an error messa
 
 Roles
 ---
-Each available role must be a subdirectory below a root roles directory.
+You can define "roles" to select the modules installed for particular a installation.
+Define roles by creating a `roles` directory with a subdirectory for each role,
+each containing a `modules.txt`.
 
 	roles/
 	|- <role>/
@@ -214,7 +219,11 @@ For example, you could define the top-level roles "development" and "public".
 Beneath each of those roles you could have a subrole for each specific type of
 server, such as "web" and "database".
 
+The `modules.txt` file in each directory above a subrole will be applied when
+a role is selected. This allows for common modules to be defined in parent role directories.
+
 ### Files
+
 Each role directory contains a text file that defines the active modules for the role.
 
 #### modules.txt
@@ -236,9 +245,6 @@ The default installation order is based on the order modules are listed in `modu
 The order can be explicitly controlled by assigning modules a relative order.
 Modules can be installed `first`, `last` or `before` or `after` another module.
 This allows subroles to install modules before or after inherited modules.
-
-The `modules.txt` file in each directory above a subrole will be applied when
-a role is selected. This allows for common modules to be defined in common role directories.
 
 
 Package Management

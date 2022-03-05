@@ -139,6 +139,8 @@ function bootstrap_modules_build_list()
 		rolepath="${rolepath}/${pathpart}"
 	done
 
+	[ ${#modulefiles[@]} -gt 0 ] || bootstrap_die "No modules.txt found"
+
 	# Sort modules by order
 	(awk -f "$BOOTSTRAP_DIR_LIB/modules_build_list.awk" "${modulefiles[@]}" | sort) > "$BOOTSTRAP_MODULES_MODULELISTPATH"
 
