@@ -17,6 +17,9 @@ BOOTSTRAP_DIR_ROOT="$CMDDIR"
 BOOTSTRAP_DIR_LIB=$(readlink -f "${BOOTSTRAP_DIR_ROOT}/../share/bootstrap-bash/lib")
 BOOTSTRAP_DIR_CACHE="/var/bootstrap-bash"
 BOOTSTRAP_DIR_CACHE_RPM="$BOOTSTRAP_DIR_CACHE/rpms"
+BOOTSTRAP_DIR_MODULES=""
+BOOTSTRAP_DIR_ROLES=""
+BOOTSTRAP_DIR_CONFIG=""
 BOOTSTRAP_DIR_ROLE=""
 BOOTSTRAP_DIR_TMP="/tmp/bootstrap-bash-$$.tmp"
 BOOTSTRAP_BASEARCH=$(/bin/uname --hardware-platform)
@@ -42,10 +45,6 @@ BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES=0
 # https://wiki.archlinux.org/index.php/Color_Bash_Prompt
 BOOTSTRAP_TTYHEADER="\e[1;37m"
 BOOTSTRAP_TTYRESET="\e[0m"
-
-# Runtime configuration file must define these
-BOOTSTRAP_DIR_MODULES=""
-BOOTSTRAP_DIR_ROLES=""
 
 ##########################################################################
 # Functions
@@ -298,7 +297,8 @@ if [ -z "${BOOTSTRAP_ROLE}" ]; then
 fi
 
 # Convert config to full path
-[ -n "$BOOTSTRAP_GETOPT_CONFIG" ] && BOOTSTRAP_GETOPT_CONFIG=$(readlink -f "$BOOTSTRAP_GETOPT_CONFIG")
+BOOTSTRAP_GETOPT_CONFIG=$(readlink -f "$BOOTSTRAP_GETOPT_CONFIG")
+BOOTSTRAP_DIR_CONFIG=$(dirname "$BOOTSTRAP_GETOPT_CONFIG")
 
 # Verify configuration file exists
 [ -f "${BOOTSTRAP_GETOPT_CONFIG}" ] || bootstrap_die "${BOOTSTRAP_GETOPT_CONFIG}: Configuration file not found"
@@ -307,22 +307,33 @@ fi
 # Import configuration file
 source $BOOTSTRAP_GETOPT_CONFIG
 
-# Validate required configuration variables
-for confvar in "BOOTSTRAP_DIR_MODULES" "BOOTSTRAP_DIR_ROLES";
-do
-	eval confdir=\$$confvar
-	[ -n "$confdir" ] || bootstrap_die "The configuration variable ${confvar} must be defined"
-done
+if [ -z "$BOOTSTRAP_DIR_MODULES" ]; then
+	# Search for modules directory
+	for p in "${BOOTSTRAP_DIR_CONFIG}/modules" "${BOOTSTRAP_DIR_CONFIG}/../modules";
+	do
+		[ -d "${p}" ] && BOOTSTRAP_DIR_MODULES=$(readlink -f "${p}")
+	done
+else
+	BOOTSTRAP_DIR_MODULES=$(readlink -f "$BOOTSTRAP_DIR_MODULES")
+	[ -d "$BOOTSTRAP_DIR_MODULES" ] || bootstrap_die "The directory specified by BOOTSTRAP_DIR_MODULES does not exist ($BOOTSTRAP_DIR_MODULES)"
+fi
 
-# Convert configuration paths to full path
-BOOTSTRAP_DIR_MODULES=$(readlink -f "$BOOTSTRAP_DIR_MODULES")
-BOOTSTRAP_DIR_ROLES=$(readlink -f "$BOOTSTRAP_DIR_ROLES")
+if [ -z "$BOOTSTRAP_DIR_ROLES" ]; then
+	# Search for roles directory
+	for p in "${BOOTSTRAP_DIR_CONFIG}/roles" "${BOOTSTRAP_DIR_CONFIG}/../roles";
+	do
+		[ -d "${p}" ] && BOOTSTRAP_DIR_ROLES=$(readlink -f "${p}")
+	done
+else
+	BOOTSTRAP_DIR_ROLES=$(readlink -f "$BOOTSTRAP_DIR_ROLES")
+	[ -d "$BOOTSTRAP_DIR_ROLES" ] || bootstrap_die "The directory specified by BOOTSTRAP_DIR_ROLES does not exist ($BOOTSTRAP_DIR_ROLES)"
+fi
 
 BOOTSTRAP_DIR_ROLE="${BOOTSTRAP_DIR_ROLES}/${BOOTSTRAP_ROLE}"
 
 # Confirm paths exist
-[ -d "$BOOTSTRAP_DIR_MODULES" ] || bootstrap_die "The directory specified by BOOTSTRAP_DIR_MODULES does not exist ($BOOTSTRAP_DIR_MODULES)"
-[ -d "$BOOTSTRAP_DIR_ROLES" ] || bootstrap_die "The directory specified by BOOTSTRAP_DIR_ROLES does not exist ($BOOTSTRAP_DIR_ROLES)"
+[ -d "$BOOTSTRAP_DIR_MODULES" ] || bootstrap_die "The 'modules' directory cannot be determined; you should set config var BOOTSTRAP_DIR_MODULES"
+[ -d "$BOOTSTRAP_DIR_ROLES" ] || bootstrap_die "The 'roles' directory cannot be determined; you should set config var BOOTSTRAP_DIR_ROLES"
 [ -d "$BOOTSTRAP_DIR_ROLE" ] || bootstrap_die "${BOOTSTRAP_ROLE}: Not a valid role"
 
 # Create cache directory
