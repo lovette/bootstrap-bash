@@ -48,8 +48,8 @@ function bootstrap_file_chown()
 ##! @fn bootstrap_mkdir(string path, string owner, string|int perms)
 ##! @brief Create directory with specified permissions and ownership
 ##! @param path New directory path; all path components will be created
-##! @param owner (optional) Directory owner; set to empty string for default
-##! @param perms (optional) File permissions; `man chmod` for allowed formats; set to 0 for default
+##! @param owner Directory owner; set to empty string for default (optional)
+##! @param perms File permissions; `man chmod` for allowed formats; set to 0 for default (optional)
 ##! @note No-op if directory already exists
 ##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_mkdir()
@@ -78,7 +78,7 @@ function bootstrap_mkdir()
 ##! @brief Download URL with `wget` and save to file
 ##! @param url URL to download
 ##! @param path File path to save as
-##! @param args (optional) Additional `wget` command line arguments
+##! @param args Additional `wget` command line arguments (optional)
 ##! @note Save path directory will be created if it does not exist
 ##! @note Save path will not be modified unless `wget` succeeds
 ##! @note Temporary file is downloaded to directory `BOOTSTRAP_DIR_TMP`
@@ -113,7 +113,7 @@ function bootstrap_file_wget()
 ##! @param path Archive file path
 ##! @param targetdir Directory in which to extract archive files
 ##! @param owner New directory and file ownership; set to empty string for default
-##! @param overwrite (optional) Overwrite mode: 0=never, 1=rmdir before extraction
+##! @param overwrite Overwrite mode: 0=never, 1=rmdir before extraction (optional)
 ##! @note The first path component of the paths in the archive will be stripped
 ##! @note No-op if `targetdir` already exists
 ##! @note Target directory will be created with permissions 755
@@ -184,9 +184,9 @@ function bootstrap_file_move()
 ##! @brief Copy a file
 ##! @param srcpath Source file path
 ##! @param destpath Destination file path
-##! @param (optional) owner New file ownership; set to empty string to preserve
-##! @param (optional) perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
-##! @param (optional) overwrite Overwrite mode: 0=never, 1=always (default), 2=if newer or file size has changed
+##! @param owner New file ownership; set to empty string to preserve (optional)
+##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve (optional)
+##! @param overwrite Overwrite mode: 0=never, 1=always (default), 2=if newer or file size has changed (optional)
 ##! @note No-op if `destpath` exists unless `overwrite` is non-zero
 ##! @note If `destpath` is an existing directory, file will be copied there using the same name.
 ##! @note Timestamps are preserved
@@ -256,10 +256,10 @@ function bootstrap_file_copy()
 ##! @param srcdir Source directory path
 ##! @param destdir Destination directory path
 ##! @param glob File pattern (e.g * or *.txt)
-##! @param (optional) owner New file ownership; set to empty string to preserve
-##! @param (optional) perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve
-##! @param (optional) overwrite Overwrite mode: 0=never, 1=always, 2=if file size has changed
-##! @param (optional) removesuffix File name suffix to remove in destination path
+##! @param owner New file ownership; set to empty string to preserve (optional)
+##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 to preserve (optional)
+##! @param overwrite Overwrite mode: 0=never, 1=always, 2=if file size has changed (optional)
+##! @param removesuffix File name suffix to remove in destination path (optional)
 ##! @note `srcdir` must exist and be readable
 ##! @note `destdir` must exist and be writable
 ##! @note Set `BOOTSTRAP_ECHO_STRIPPATH` to a path to strip from status message
@@ -329,8 +329,8 @@ function bootstrap_file_link()
 ##! @fn bootstrap_file_create(string path, string owner, string|int perms)
 ##! @brief Create empty file using `touch`.
 ##! @param path New file path
-##! @param (optional) owner New file ownership; set to empty string for default
-##! @param (optional) perms New file permissions; `man chmod` for allowed formats; set to 0 for default
+##! @param owner New file ownership; set to empty string for default (optional)
+##! @param perms New file permissions; `man chmod` for allowed formats; set to 0 for default (optional)
 ##! @note No-op if `path` exists
 ##! @return Zero if successful, calls `bootstrap_die` otherwise
 function bootstrap_file_create()
