@@ -138,7 +138,8 @@ configuration and package management for the module.
 	|- <module name>/
 	|...
 
-If you are not using roles, simply create a `modules.txt` in the root `modules` directory. 
+If you are not using roles and want to select a subset of defined modules you can create 
+a `modules.txt` in the root `modules` directory. 
 To control the modules selected for multiple roles, create a `roles` directory as outlined below.
 
 ### Files

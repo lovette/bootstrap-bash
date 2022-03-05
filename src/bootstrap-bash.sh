@@ -25,6 +25,7 @@ BOOTSTRAP_DIR_TMP="/tmp/bootstrap-bash-$$.tmp"
 BOOTSTRAP_BASEARCH=$(/bin/uname --hardware-platform)
 BOOTSTRAP_PROCARCH=$(/bin/uname --processor)
 BOOTSTRAP_MODULE_NAMES=( )
+BOOTSTRAP_SELECTALLMODULES=0
 BOOTSTRAP_INSTALL_FORCED=0
 BOOTSTRAP_HOOK_INSTALLPACKAGES=( )
 BOOTSTRAP_HOOK_BEFOREINSTALL=( )
@@ -174,9 +175,18 @@ function init_module_names()
 	local activemodules=( )
 
 	BOOTSTRAP_MODULE_NAMES=( )
+	BOOTSTRAP_ROLE_ALL_MODULES=( )
+	BOOTSTRAP_ROLE_DEFAULT_MODULES=( )
+	BOOTSTRAP_ROLE_OPTIONAL_MODULES=( )
 
-	# Enumerate all modules selected for the role
-	bootstrap_modules_build_list
+	if [ $BOOTSTRAP_SELECTALLMODULES -eq 1 ]; then
+		# Select all defined modules
+		BOOTSTRAP_ROLE_ALL_MODULES=( $(find "$BOOTSTRAP_DIR_MODULES" -maxdepth 1 -mindepth 1 -type d -printf "%f\n") )
+		BOOTSTRAP_ROLE_DEFAULT_MODULES=( ${BOOTSTRAP_ROLE_ALL_MODULES[@]} )
+	else
+		# Enumerate all modules selected for the role
+		bootstrap_modules_build_list
+	fi
 
 	# Activate all modules or only default modules?
 	if [ $BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES -eq 1 ]; then
@@ -344,11 +354,10 @@ if [ -n "$BOOTSTRAP_ROLE" ]; then
 	[ -f "${BOOTSTRAP_DIR_MODULES}/modules.txt" ] && bootstrap_die "${BOOTSTRAP_DIR_MODULES} should not contain modules.txt when roles are defined"
 elif [ -n "$BOOTSTRAP_DIR_ROLES" ]; then
 	bootstrap_die "${BOOTSTRAP_DIR_ROLES}: ROLE argument must be specified when 'roles' are defined"
-elif [ -f "${BOOTSTRAP_DIR_MODULES}/modules.txt" ]; then
+else
 	BOOTSTRAP_DIR_ROLES="$BOOTSTRAP_DIR_MODULES"
 	BOOTSTRAP_DIR_ROLE="$BOOTSTRAP_DIR_ROLES"
-else
-	bootstrap_die "${BOOTSTRAP_DIR_MODULES} must contain modules.txt when no roles are defined"
+	[ -f "${BOOTSTRAP_DIR_MODULES}/modules.txt" ] || BOOTSTRAP_SELECTALLMODULES=1
 fi
 
 # Create cache directory

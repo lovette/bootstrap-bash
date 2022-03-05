@@ -106,7 +106,7 @@ function bootstrap_modules_get_version_info()
 }
 
 # bootstrap_modules_build_list()
-# Build list of modules based on the active role
+# Build list of modules based on modules.txt defined for the active role
 # Return value is these global arrays:
 #   BOOTSTRAP_ROLE_ALL_MODULES - all modules
 #   BOOTSTRAP_ROLE_DEFAULT_MODULES - default modules
@@ -121,10 +121,6 @@ function bootstrap_modules_build_list()
 	local REGEX_OPTIONAL_MODULE="\((.+)\)"
 	local filepath=""
 	local modules=""
-
-	BOOTSTRAP_ROLE_ALL_MODULES=( )
-	BOOTSTRAP_ROLE_DEFAULT_MODULES=( )
-	BOOTSTRAP_ROLE_OPTIONAL_MODULES=( )
 
 	filepath="${BOOTSTRAP_DIR_ROLES}/modules.txt"
 	[ -f "$filepath" ] && modulefiles+=("$filepath")
