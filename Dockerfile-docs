@@ -1,0 +1,8 @@
+FROM ubuntu
+
+RUN set -eux; \
+	apt-get update; \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y mawk- gawk make doxygen help2man; \
+	rm -rf /var/lib/apt/lists/*
+
+WORKDIR /usr/src
