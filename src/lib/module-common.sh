@@ -24,7 +24,7 @@
 ##! @param message (optional) Error message
 function bootstrap_die()
 {
-	local message="$1"
+	local message="${1:-}"
 
 	[ -n "$message" ] && echo " ! $message"
 	echo " ! Aborting module install"

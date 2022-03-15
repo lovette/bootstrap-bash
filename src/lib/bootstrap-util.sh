@@ -12,7 +12,7 @@
 # Prints optional message and exits with an error code
 function bootstrap_die()
 {
-	local message="$1"
+	local message="${1:-}"
 
 	[ -n "$message" ] && echo "$message"
 	echo "Aborting bootstrap install!"
