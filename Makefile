@@ -43,8 +43,11 @@ doxygen:
 	-chmod +x docs/doxygen/sh2doxy.sh
 	doxygen docs/doxygen/bootstrap-bash.d
 
-docs-podman-build:
+podman-build-docs:
 	podman build -f Dockerfile-docs -t bootstrap-bash-docs
 
-docs-podman-run:
+podman-run-docs:
 	podman run -it --rm -v "${PWD}":/usr/src bootstrap-bash-docs
+
+podman-build-src:
+	podman build -f Dockerfile-src -t bootstrap-bash

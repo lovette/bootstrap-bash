@@ -91,6 +91,21 @@ It can be run directly from the source directory using a `RUN` statement such as
 		rm -rf /root/bootstrap-bash.zip /root/bootstrap-bash-master /root/bootstrap-container; \
 		rm -rf /var/lib/apt/lists/*
 
+Or use a multi-stage build to copy the source from a container image:
+
+	ARG BOOTSTRAP_ROLE=database
+
+	COPY --from=ghcr.io/lovette/bootstrap-bash /bootstrap-bash/src /usr/local/opt/bootstrap-bash
+
+	COPY bootstrap-container /root/bootstrap-container
+
+	RUN set -eux; \
+		apt-get update; \
+		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mawk- gawk; \
+		bash /usr/local/opt/bootstrap-bash/bootstrap-bash.sh -y -c /root/bootstrap-container ${BOOTSTRAP_ROLE}; \
+		rm -rf /usr/local/opt/bootstrap-bash /root/bootstrap-container; \
+		rm -rf /var/lib/apt/lists/*
+
 Notice for some images you must replace `mawk` with `gawk` because `bootstrap-bash` uses awk features that mawk doesn't support.
 
 
