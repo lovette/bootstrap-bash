@@ -249,7 +249,7 @@ The following formats are accepted:
 
 	module
 	(module)
-	module first|last
+	module first|last|N
 	module before|after module
 
 Blank lines and comment lines beginning with "#" will be ignored.
@@ -258,7 +258,7 @@ Optional modules can be specified by enclosing the name within parenthesis.
 These modules will only be installed when explicitly specified with `-m` option.
 
 The default installation order is based on the order modules are listed in `modules.txt`.
-The order can be explicitly controlled by assigning modules a relative order.
+The order can be explicitly controlled by assigning modules a relative order `N`.
 Modules can be installed `first`, `last` or `before` or `after` another module.
 This allows subroles to install modules before or after inherited modules.
 
