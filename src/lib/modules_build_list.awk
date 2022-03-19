@@ -40,7 +40,6 @@ BEGIN {
 		next;
 
 	name=$1;
-	curorder=$2;
 
 	if (match($NF, "^\\([,A-Za-z0-9]+\\)$"))
 	{
@@ -59,11 +58,21 @@ BEGIN {
 		$NF = "";
 	}
 
-	if (!match(curorder, "^(first|last|before|after)"))
+	if (NF == 1)
 	{
 		# If an order is not set explicitly, assign a default
+		curorder=defaultorder;
+		defaultorder += 5
+		minorder = (curorder < minorder) ? curorder : minorder;
+		maxorder = (curorder > maxorder) ? curorder : maxorder;
+	}
+	else if (!match($2, "^(first|last|before|after)"))
+	{
+		curorder=$2;
+
 		if (!match(curorder, "^[0-9]+$"))
 		{
+			# Invalid value
 			curorder = defaultorder;
 			defaultorder += 5
 		}
