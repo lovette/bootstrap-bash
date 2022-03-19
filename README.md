@@ -50,7 +50,6 @@ Requirements
 ---
 
 * [BASH 3.0 or later](http://www.gnu.org/software/bash/) or compatible shell
-* AWK that supports `match` with regular expression captures
 
 Will not run on *macOS* because it does not (yet) support `readlink -f`.
 
@@ -85,7 +84,6 @@ It can be run directly from the source directory using a `RUN` statement such as
 
 	RUN set -eux; \
 		apt-get update; \
-		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mawk- gawk; \
 		unzip -q /root/bootstrap-bash.zip -d /root; \
 		bash /root/bootstrap-bash-master/src/bootstrap-bash.sh -y -c /root/bootstrap-container ${BOOTSTRAP_ROLE}; \
 		rm -rf /root/bootstrap-bash.zip /root/bootstrap-bash-master /root/bootstrap-container; \
@@ -101,12 +99,9 @@ Or use a multi-stage build to copy the source from a container image:
 
 	RUN set -eux; \
 		apt-get update; \
-		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mawk- gawk; \
 		bash /usr/local/opt/bootstrap-bash/bootstrap-bash.sh -y -c /root/bootstrap-container ${BOOTSTRAP_ROLE}; \
 		rm -rf /usr/local/opt/bootstrap-bash /root/bootstrap-container; \
 		rm -rf /var/lib/apt/lists/*
-
-Notice for some images you must replace `mawk` with `gawk` because `bootstrap-bash` uses awk features that mawk doesn't support.
 
 
 Usage

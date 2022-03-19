@@ -6,9 +6,6 @@
 # 000405  moduleC
 # 000410  moduleD
 #
-# Note that `mawk` does not support `match()` with regex capture so you will have to
-# replace it with `gawk` depending on your distribution.
-#
 # Invoked as:
 # awk -v include_tags=foo,bar -f /path/modules_build_list.awk /path/modules.txt /path/modules.txt ...
 
@@ -69,26 +66,31 @@ BEGIN {
 		minorder = (curorder < minorder) ? curorder : minorder;
 		maxorder = (curorder > maxorder) ? curorder : maxorder;
 	}
-	else if (!match($2, "^(first|last|before|after)"))
-	{
-		curorder=$2;
-
-		if (!match(curorder, "^[0-9]+$"))
-		{
-			# Invalid value
-			curorder = defaultorder;
-			defaultorder += 5
-		}
-
-		minorder = (curorder < minorder) ? curorder : minorder;
-		maxorder = (curorder > maxorder) ? curorder : maxorder;
-	}
 	else
 	{
-		$1 = ""
-		curorder = $0
-		gsub(/^[ ]+/, "", curorder) # ltrim whitespace
-		relnames[relcount++] = name;
+		curorder=$2
+
+		if (match(curorder, "^(first|last)"))
+		{
+			relnames[relcount++] = name;
+		}
+		else if (match(curorder, "^(before|after)"))
+		{
+			relnames[relcount++] = name;
+			relto[name] = $3;
+		}
+		else
+		{
+			if (!match(curorder, "^[0-9]+$"))
+			{
+				# Invalid value
+				curorder = defaultorder;
+				defaultorder += 5
+			}
+
+			minorder = (curorder < minorder) ? curorder : minorder;
+			maxorder = (curorder > maxorder) ? curorder : maxorder;
+		}
 	}
 
 	modulenames[modulecount++] = name;
@@ -118,55 +120,47 @@ END {
 		}
 	}
 
+	# Assign before/after relative to numeric order of another module
 	while (relcount > 0)
 	{
 		for (i in relnames)
 		{
 			name = relnames[i];
 			curorder = moduleorder[name];
+			reltoname = relto[name];
 
-			# Assign before/after relative order a numeric order
-			if (match(curorder, "(before|after) (.+)", parts))
+			if (reltoname in moduleorder)
 			{
-				if (parts[2] in moduleorder)
+				reltoorder = moduleorder[reltoname];
+
+				# If relative to another relative, resolve later
+				if (!match(reltoorder, "^[0-9]+$"))
+					continue;
+
+				if (curorder == "before")
 				{
-					curorder = moduleorder[parts[2]];
-
-					# If relative to another relative, resolve later
-					if (!match(curorder, "^[0-9]+$"))
-						continue;
-
-					if (parts[1] == "before")
-					{
-						# Shift everything up
-						for (j in moduleorder)
-							if (match(moduleorder[j], "^[0-9]+$"))
-								if (moduleorder[j] >= curorder)
-									moduleorder[j]++;
-						maxorder++;
-					}
-					else if (parts[1] == "after")
-					{
-						# Shift everything down
-						for (j in moduleorder)
-							if (match(moduleorder[j], "^[0-9]+$"))
-								if (moduleorder[j] <= curorder)
-									moduleorder[j]--;
-						minorder--;
-					}
-
-					moduleorder[name] = curorder;
-				}
-				else
-				{
-					# Relative to unknown, put last
+					# Shift everything up
+					for (j in moduleorder)
+						if (match(moduleorder[j], "^[0-9]+$"))
+							if (moduleorder[j] >= reltoorder)
+								moduleorder[j]++;
 					maxorder++;
-					moduleorder[name] = maxorder;
 				}
+				else if (curorder == "after")
+				{
+					# Shift everything down
+					for (j in moduleorder)
+						if (match(moduleorder[j], "^[0-9]+$"))
+							if (moduleorder[j] <= reltoorder)
+								moduleorder[j]--;
+					minorder--;
+				}
+
+				moduleorder[name] = reltoorder;
 			}
 			else
 			{
-				# Unknown directive, put last
+				# Relative to unknown, put last
 				maxorder++;
 				moduleorder[name] = maxorder;
 			}
