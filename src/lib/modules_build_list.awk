@@ -25,14 +25,14 @@ BEGIN {
 		defaultorder = filenum++ * 200;
 	curfile=FILENAME;
 
+	# Skip blank lines and comments
+	if ($0 == "")
+		next;
+	if (substr($0, 1, 1) == "#")
+		next;
+
 	name=$1;
 	curorder=$2;
-
-	# Skip blank lines and comments
-	if (name == "")
-		next;
-	if (substr(name, 1, 1) == "#")
-		next;
 
 	if (!match(curorder, "^(first|last|before|after)"))
 	{
