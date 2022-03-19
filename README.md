@@ -202,6 +202,7 @@ and `config.sh` scripts:
 
 * `BOOTSTRAP_MODULE_NAME` - The name of the module being installed
 * `BOOTSTRAP_ROLE` - The active role being installed; can be blank.
+* `BOOTSTRAP_INCLUDE_TAGS` - The tags given to select modules, comma-delimited; can be blank.
 * `BOOTSTRAP_BASEARCH` - The server hardware (base) architecture (e.g. i386, x86_64)
 * `BOOTSTRAP_PROCARCH` - The server processor architecture (e.g. i686, x86_64)
 * `BOOTSTRAP_INSTALL_FORCED` - The install is being run for the first time or with the `-f` option
@@ -261,6 +262,10 @@ The default installation order is based on the order modules are listed in `modu
 The order can be explicitly controlled by assigning modules a relative order `N`.
 Modules can be installed `first`, `last` or `before` or `after` another module.
 This allows subroles to install modules before or after inherited modules.
+
+Modules can also be associated with tags which can be used to filter selected modules.
+
+	modulea before moduleb (tag1,tag2,...)
 
 
 Package Management

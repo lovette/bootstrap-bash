@@ -8,6 +8,9 @@
 #
 # Note that `mawk` does not support `match()` with regex capture so you will have to
 # replace it with `gawk` depending on your distribution.
+#
+# Invoked as:
+# awk -v include_tags=foo,bar -f /path/modules_build_list.awk /path/modules.txt /path/modules.txt ...
 
 BEGIN {
 	defaultorder=0;
@@ -17,6 +20,11 @@ BEGIN {
 	relcount=0;
 	minorder=999999;
 	maxorder=0;
+
+	# Turn tags argument into assoc array
+	split(include_tags, tmp, ",");
+	for (i in tmp)
+		include_tags_hash[tmp[i]] = 1;
 }
 
 {
@@ -33,6 +41,23 @@ BEGIN {
 
 	name=$1;
 	curorder=$2;
+
+	if (match($NF, "^\\([,A-Za-z0-9]+\\)$"))
+	{
+		tag_found = 0;
+
+		# Module has tags, see if they match any provided
+		split(substr($NF, 2, length($NF)-2), tmp, ",")
+		for (i in tmp) {
+			if (include_tags_hash[tmp[i]] == 1)
+				tag_found++;
+		}
+
+		if (!tag_found)
+			next;
+
+		$NF = "";
+	}
 
 	if (!match(curorder, "^(first|last|before|after)"))
 	{

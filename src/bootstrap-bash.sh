@@ -41,6 +41,7 @@ BOOTSTRAP_GETOPT_PROMPT=1
 BOOTSTRAP_GETOPT_PACKAGESONLY=0
 BOOTSTRAP_GETOPT_CONFIGONLY=0
 BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES=0
+BOOTSTRAP_GETOPT_TAGS=( )
 
 # You can find a list of color values at
 # https://wiki.archlinux.org/index.php/Color_Bash_Prompt
@@ -84,6 +85,7 @@ function usage()
 	echo "  -O             Include optional modules"
 	echo "  -p             Package management only, skip install scripts"
 	echo "  -s             Debug: output module install script commands, check syntax (implies -d)"
+	echo "  -t TAG         Include modules with given tag (specify -t for each tag)"
 	echo "  -V, --version  Print version and exit"
 	echo "  -u             Update configurations only, skip package management and install scripts"
 	echo "  -x             Debug: execute module install scripts with 'bash -x'"
@@ -266,7 +268,7 @@ source ${BOOTSTRAP_DIR_LIB}/yum.sh
 source ${BOOTSTRAP_DIR_LIB}/rpm.sh
 
 # Parse command line options
-while getopts "c:dfhlm:OpsVuxy" opt
+while getopts "c:dfhlm:Opst:Vuxy" opt
 do
 	case $opt in
 	c  ) BOOTSTRAP_GETOPT_CONFIG=$OPTARG;;
@@ -278,6 +280,7 @@ do
 	O  ) BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES=1;;
 	p  ) BOOTSTRAP_GETOPT_PACKAGESONLY=1; BOOTSTRAP_GETOPT_FORCE=0;;
 	s  ) BOOTSTRAP_GETOPT_DRYRUN=1; BOOTSTRAP_GETOPT_PRINTSCRIPTS=1;;
+	t  ) BOOTSTRAP_GETOPT_TAGS+=($OPTARG);;
 	u  ) BOOTSTRAP_GETOPT_CONFIGONLY=1; BOOTSTRAP_GETOPT_FORCE=0;;
 	x  ) BOOTSTRAP_GETOPT_BASH_DEBUG=1;;
 	y  ) BOOTSTRAP_GETOPT_PROMPT=0;;
@@ -289,6 +292,12 @@ done
 # Final command line option is the role
 shift $(($OPTIND - 1))
 [ $# -ge 1 ] && BOOTSTRAP_ROLE="$1"
+
+# BOOTSTRAP_INCLUDE_TAGS can be set as an environment variable.
+# Tags can be separated by spaces or commas so do not quote the array expansion.
+# Pass tags to modules as comma-delimited list.
+[ -n "$BOOTSTRAP_INCLUDE_TAGS" ] && BOOTSTRAP_GETOPT_TAGS+=( $BOOTSTRAP_INCLUDE_TAGS )
+BOOTSTRAP_INCLUDE_TAGS=$(IFS=, ; echo "${BOOTSTRAP_GETOPT_TAGS[*]}")
 
 [[ $(id -u) -eq 0 ]] || { echo "$CMDNAME: You must be root user to run this script."; exit 1; }
 

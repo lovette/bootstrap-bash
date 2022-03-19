@@ -138,7 +138,7 @@ function bootstrap_modules_build_list()
 	[ ${#modulefiles[@]} -gt 0 ] || bootstrap_die "No modules.txt found"
 
 	# Sort modules by order
-	(awk -f "$BOOTSTRAP_DIR_LIB/modules_build_list.awk" "${modulefiles[@]}" | sort) > "$BOOTSTRAP_MODULES_MODULELISTPATH"
+	(awk -v include_tags="$BOOTSTRAP_INCLUDE_TAGS" -f "$BOOTSTRAP_DIR_LIB/modules_build_list.awk" "${modulefiles[@]}" | sort) > "$BOOTSTRAP_MODULES_MODULELISTPATH"
 
 	modules=$(cut -f2 "$BOOTSTRAP_MODULES_MODULELISTPATH")
 
@@ -192,6 +192,7 @@ function bootstrap_modules_script_exec()
 	export BOOTSTRAP_INSTALL_FORCED
 	export BOOTSTRAP_DIR_LIB
 	export BOOTSTRAP_DIR_ROLE
+	export BOOTSTRAP_INCLUDE_TAGS
 	export BOOTSTRAP_DIR_MODULE
 	export BOOTSTRAP_DIR_MODULE_CACHE
 	export BOOTSTRAP_DIR_TMP
