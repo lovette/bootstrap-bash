@@ -21,6 +21,9 @@ BEGIN {
 	minorder=999999;
 	maxorder=0;
 
+	# Force declare empty array
+	relnames[0]=0; delete relnames[0];
+
 	# Turn tags argument into assoc array
 	split(include_tags, tmp, ",");
 	for (i in tmp)
