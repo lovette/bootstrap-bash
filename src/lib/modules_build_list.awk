@@ -57,7 +57,7 @@ BEGIN {
 			# Module has tags, see if they match any provided
 			split(substr($NF, 2, length($NF)-2), tmp, ",")
 			for (i in tmp) {
-				if (include_tags_hash[tmp[i]] == 1)
+				if (tmp[i] in include_tags_hash)
 					tag_found++;
 			}
 
