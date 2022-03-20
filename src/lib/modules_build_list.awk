@@ -41,26 +41,8 @@ BEGIN {
 
 	name=$1;
 
-	if (match($NF, "^\\([,A-Za-z0-9]+\\)$"))
-	{
-		tag_found = 0;
-
-		# Module has tags, see if they match any provided
-		split(substr($NF, 2, length($NF)-2), tmp, ",")
-		for (i in tmp) {
-			if (include_tags_hash[tmp[i]] == 1)
-				tag_found++;
-		}
-
-		if (!tag_found)
-			next;
-
-		$NF = "";
-	}
-
 	if (NF == 1)
 	{
-		# If an order is not set explicitly, assign a default
 		curorder=defaultorder;
 		defaultorder += 5
 		minorder = (curorder < minorder) ? curorder : minorder;
@@ -68,6 +50,23 @@ BEGIN {
 	}
 	else
 	{
+		if (match($NF, "^\\([,A-Za-z0-9]+\\)$"))
+		{
+			tag_found = 0;
+
+			# Module has tags, see if they match any provided
+			split(substr($NF, 2, length($NF)-2), tmp, ",")
+			for (i in tmp) {
+				if (include_tags_hash[tmp[i]] == 1)
+					tag_found++;
+			}
+
+			if (!tag_found)
+				next;
+
+			$NF = "";
+		}
+
 		curorder=$2
 
 		if (match(curorder, "^(first|last)"))
@@ -83,7 +82,6 @@ BEGIN {
 		{
 			if (!match(curorder, "^[0-9]+$"))
 			{
-				# Invalid value
 				curorder = defaultorder;
 				defaultorder += 5
 			}
