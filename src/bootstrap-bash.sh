@@ -11,7 +11,7 @@ CMDNAME=$(basename "$CMDPATH")
 CMDDIR=$(dirname "$CMDPATH")
 CMDARGS=$@
 
-BOOTSTRAP_VER="1.1.2"
+BOOTSTRAP_VER="1.1.3"
 BOOTSTRAP_ROLE=""
 BOOTSTRAP_DIR_ROOT="$CMDDIR"
 BOOTSTRAP_DIR_LIB=$(readlink -f "${BOOTSTRAP_DIR_ROOT}/../share/bootstrap-bash/lib")
