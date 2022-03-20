@@ -97,31 +97,44 @@ BEGIN {
 
 END {
 	# Assign first/last relative order a numeric order
-	for (i in relnames)
+	if (relcount > 0)
 	{
-		name = relnames[i];
-		curorder = moduleorder[name];
+		# Iterate a copy so relnames size does not change during loop execution
+		for (i in relnames)
+			relnamescopy[i] = relnames[i];
 
-		if (curorder == "first")
+		for (i in relnamescopy)
 		{
-			minorder--;
-			moduleorder[name] = minorder;
-			delete relnames[i];
-			relcount--;
+			name = relnames[i];
+			curorder = moduleorder[name];
+
+			if (curorder == "first")
+			{
+				minorder--;
+				moduleorder[name] = minorder;
+				delete relnames[i];
+				relcount--;
+			}
+			else if (curorder == "last")
+			{
+				maxorder++;
+				moduleorder[name] = maxorder;
+				delete relnames[i];
+				relcount--;
+			}
 		}
-		else if (curorder == "last")
-		{
-			maxorder++;
-			moduleorder[name] = maxorder;
-			delete relnames[i];
-			relcount--;
-		}
+
+		delete relnamescopy;
 	}
 
 	# Assign before/after relative to numeric order of another module
 	while (relcount > 0)
 	{
+		# Iterate a copy so relnames size does not change during loop execution
 		for (i in relnames)
+			relnamescopy[i] = relnames[i];
+
+		for (i in relnamescopy)
 		{
 			name = relnames[i];
 			curorder = moduleorder[name];
@@ -167,6 +180,7 @@ END {
 			relcount--;
 		}
 
+		delete relnamescopy;
 	}
 
 	for (name in moduleorder)
