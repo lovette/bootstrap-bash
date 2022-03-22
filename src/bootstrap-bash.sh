@@ -406,6 +406,7 @@ fi
 
 echo "Executing bootstrap process for ${BOOTSTRAP_ROLE:-default} role..."
 echo "Platform is $BOOTSTRAP_BASEARCH ($BOOTSTRAP_PROCARCH)"
+[ -n "$BOOTSTRAP_INCLUDE_TAGS" ] && echo "With tags: $BOOTSTRAP_INCLUDE_TAGS"
 
 if [ $BOOTSTRAP_GETOPT_CONFIGONLY -eq 1 ] && [ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ]; then
 	bootstrap_die "Command line options -p and -u cannot be combined"
