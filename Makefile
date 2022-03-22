@@ -51,3 +51,7 @@ podman-run-docs:
 
 podman-build-src:
 	podman build -f Dockerfile-src -t bootstrap-bash
+
+gitsync:
+	@git diff HEAD --quiet || (echo "Working directory is not clean"; exit 1)
+	git fetch --all && git reset --hard origin/master && git clean --quiet --force -dx
