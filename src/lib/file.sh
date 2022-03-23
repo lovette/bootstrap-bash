@@ -10,6 +10,8 @@
 ##! @file
 ##! @brief Convenience functions to manage files and directories
 
+BOOTSTRAP_ECHO_STRIPPATH=""
+
 ##! @fn bootstrap_file_chmod(string path, string|int perms)
 ##! @brief Set file access permissions
 ##! @param path File path
