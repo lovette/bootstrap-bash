@@ -11,7 +11,7 @@
 ##! @brief Convenience functions to manage users and groups
 
 ##! @fn bootstrap_user_exists(string name)
-##! @brief Check if user name exists.
+##! @brief Check if user name or UID exists.
 ##! @param name User name or uid
 ##! @return Zero if user exists, non-zero otherwise
 function bootstrap_user_exists()
@@ -20,12 +20,12 @@ function bootstrap_user_exists()
 }
 
 ##! @fn bootstrap_user_group_exists(string name)
-##! @brief Check if group name exists.
+##! @brief Check if group name or GID exists.
 ##! @param name Group name or gid
 ##! @return Zero if group exists, non-zero otherwise
 function bootstrap_user_group_exists()
 {
-	/usr/bin/id -g "$1" &>/dev/null
+	getent group "$1" &>/dev/null
 }
 
 ##! @fn bootstrap_user_group_add(int gid, string name)
@@ -41,11 +41,11 @@ function bootstrap_user_group_add()
 
 	if bootstrap_user_group_exists "$GNAME"; then
 		# Group name exists, confirm it has requested GID
-		IDOUT=$(/usr/bin/id -g "$GNAME")
+		IDOUT=$(getent group "$GNAME" | cut -d: -f3)
 		[[ "$IDOUT" == "$ADDGID" ]] || bootstrap_die "Cannot create group $GNAME($ADDGID): Group exists but has GID $IDOUT"
 	elif bootstrap_user_group_exists "$ADDGID"; then
 		# GID exists but with another name
-		IDOUT=$(/usr/bin/id -ng "$ADDGID")
+		IDOUT=$(getent group "$ADDGID" | cut -d: -f1)
 		bootstrap_die "Cannot create group $GNAME($ADDGID): GID $ADDGID refers to group '$IDOUT'"
 	else
 		/usr/sbin/groupadd -g "$ADDGID" "$GNAME"
