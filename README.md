@@ -93,7 +93,7 @@ Or use a multi-stage build to copy the source from a container image:
 
 	ARG BOOTSTRAP_ROLE=database
 
-	COPY --from=ghcr.io/lovette/bootstrap-bash /bootstrap-bash/src /usr/local/opt/bootstrap-bash
+	COPY --from=ghcr.io/lovette/bootstrap-bash:master /bootstrap-bash/src /usr/local/opt/bootstrap-bash
 
 	COPY bootstrap-container /root/bootstrap-container
 
