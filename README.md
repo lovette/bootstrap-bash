@@ -275,6 +275,7 @@ so dependencies can be managed through a package manager.
 ### YUM
 
 `yum-packages.txt` lists all packages that should be installed or removed with `yum`.
+This will be skipped if `yum` command is not available.
 
 #### Packages
 
@@ -310,6 +311,7 @@ or the processor architecture (e.g. i686, x86_64) with {BOOTSTRAP_PROCARCH}.
 ### RPM
 
 `rpm-packages.txt` lists all packages that should be installed with `rpm` directly.
+This will be skipped if `rpm` command is not available.
 
 	PATH|URL [nodeps]
 

@@ -41,6 +41,8 @@ BOOTSTRAP_GETOPT_PACKAGESONLY=0
 BOOTSTRAP_GETOPT_CONFIGONLY=0
 BOOTSTRAP_GETOPT_INCLUDEOPTIONALMODULES=0
 BOOTSTRAP_GETOPT_TAGS=( )
+BOOTSTRAP_PKG_YUM=1
+BOOTSTRAP_PKG_RPM=1
 
 # You can find a list of color values at
 # https://wiki.archlinux.org/index.php/Color_Bash_Prompt
@@ -385,6 +387,14 @@ fi
 
 BOOTSTRAP_MODULES_MODULELISTPATH="$BOOTSTRAP_DIR_CACHE/modulelist"
 
+# Disable yum and rpm package management if system does not support
+if (("$BOOTSTRAP_PKG_YUM")); then
+	command -v yum &> /dev/null || BOOTSTRAP_PKG_YUM=0
+fi
+if (("$BOOTSTRAP_PKG_RPM")); then
+	command -v rpm &> /dev/null || BOOTSTRAP_PKG_RPM=0
+fi
+
 init_module_names
 
 [ "${#BOOTSTRAP_MODULE_NAMES[@]}" -gt 0 ] || bootstrap_die "No modules selected"
@@ -454,11 +464,15 @@ echo "${BOOTSTRAP_MODULE_NAMES[@]}" > "$BOOTSTRAP_DIR_CACHE/activemodulelist"
 if [ $BOOTSTRAP_GETOPT_CONFIGONLY -ne 1 ]; then
 	[ $BOOTSTRAP_GETOPT_PACKAGESONLY -ne 1 ] && bootstrap_modules_preinstall "${BOOTSTRAP_MODULE_NAMES[@]}"
 
-	bootstrap_yum_repos_add "${BOOTSTRAP_MODULE_NAMES[@]}"
-	bootstrap_yum_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
-	bootstrap_yum_packages_remove "${BOOTSTRAP_MODULE_NAMES[@]}"
+	if (("$BOOTSTRAP_PKG_YUM")); then
+		bootstrap_yum_repos_add "${BOOTSTRAP_MODULE_NAMES[@]}"
+		bootstrap_yum_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+		bootstrap_yum_packages_remove "${BOOTSTRAP_MODULE_NAMES[@]}"
+	fi
 
-	bootstrap_rpm_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+	if (("$BOOTSTRAP_PKG_RPM")); then
+		bootstrap_rpm_packages_install "${BOOTSTRAP_MODULE_NAMES[@]}"
+	fi
 
 	bootstrap_modules_exec_hook "install packages" "installpackages-hook.sh" "${BOOTSTRAP_HOOK_INSTALLPACKAGES[@]}"
 
