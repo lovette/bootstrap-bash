@@ -134,10 +134,10 @@ function bootstrap_yum_packages_remove()
 		bootstrap_echo_header "Removing Yum packages..."
 
 		if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
-			/usr/bin/yum -q remove ${packages[@]}
+			yum -y remove ${packages[@]}  |& sed "s/^/   > /"
 			[ ${PIPESTATUS[0]} -ne 0 ] && bootstrap_die
 		else
-			echo "+ /usr/bin/yum -q remove" "${packages[@]}"
+			echo "+ yum -y remove" "${packages[@]}"
 		fi
 	elif [ $skipped -gt 0 ]; then
 		echo ""
@@ -219,10 +219,10 @@ function bootstrap_yum_packages_install()
 			packages=$(grep "^$reponame " $packagelistcache | awk '{ print $2 };' | sort | uniq | tr -s '[:space:]' ' ')
 
 			if [ $BOOTSTRAP_GETOPT_DRYRUN -eq 0 ]; then
-				/usr/bin/yum -q install $yumargs ${packages[@]}
+				yum -y install $yumargs ${packages[@]}  |& sed "s/^/   > /"
 				[ ${PIPESTATUS[0]} -ne 0 ] && bootstrap_die
 			else
-				echo "+ /usr/bin/yum -q install $yumargs" "${packages[@]}"
+				echo "+ yum -y install $yumargs" "${packages[@]}"
 			fi
 		done
 	elif [ $skipped -gt 0 ]; then
