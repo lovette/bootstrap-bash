@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM docker.io/library/ubuntu:latest
 
 RUN set -eux; \
 	apt-get update; \
