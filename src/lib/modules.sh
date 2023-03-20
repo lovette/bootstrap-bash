@@ -65,7 +65,7 @@ function bootstrap_modules_reset_states()
 # Deletes all state files for all modules
 function bootstrap_modules_reset_states_all()
 {
-	find "${BOOTSTRAP_DIR_CACHE}" -mindepth 1 -maxdepth 1 -print0 | xargs -r -0 /bin/rm -rf
+	find "${BOOTSTRAP_DIR_CACHE}" -mindepth 1 -maxdepth 1 -name "module-*" -print0 | xargs -r -0 /bin/rm -rf
 }
 
 # bootstrap_modules_is_installed(module name)
