@@ -25,7 +25,7 @@ function bootstrap_rpm_packages_install()
 	local forced=0
 	local optionnodeps=0
 	local NODEPSREGEX="^(.+)[[:space:]]+nodeps"
-	local REMOTEPATHREGEX="^(http|ftp)://"
+	local REMOTEPATHREGEX="^(https?|ftp)://"
 
 	[ $BOOTSTRAP_GETOPT_PACKAGESONLY -eq 1 ] && forced=1
 
