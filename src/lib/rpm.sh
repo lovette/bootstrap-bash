@@ -40,7 +40,7 @@ function bootstrap_rpm_packages_install()
 			old_IFS=$IFS
 			IFS=$'\n' # process package list line by line
 
-			rpms=( $(grep -v -E "(^[:space:]*#|^[:space:]*$)" "$packagefilepath") )
+			rpms=( $(grep -v -E "(^[[:space:]]*#|^[[:space:]]*$)" "$packagefilepath") )
 
 			if [ "${#rpms[@]}" -gt 0 ]; then
 				if [ $forced -eq 1 ] || ! bootstrap_modules_check_state "$module" "rpm-install"; then
